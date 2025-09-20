@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "225529638875",
+    "project_id": "western-oarlock-466702-d3",
+    "storage_bucket": "western-oarlock-466702-d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225529638875:android:e2ee52afbb0c8ed0a341fe",
+        "android_client_info": {
+          "package_name": "com.example.sneak_peak"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "225529638875-fq2c9grbmm8vsdlmcdiakqq6657tb39d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sneak_peak",
+            "certificate_hash": "db7706b9ffa57f13711dc871502d57a4582e1fb2"
+          }
+        },
+        {
+          "client_id": "225529638875-n21n2ofv75fam4709chdn164jnh4mqk8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_vpgXJD6z-lquKV4dBpjPIfX0eZyteLM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "225529638875-n21n2ofv75fam4709chdn164jnh4mqk8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
