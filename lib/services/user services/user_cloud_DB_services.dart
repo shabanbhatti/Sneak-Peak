@@ -228,6 +228,80 @@ Stream<List<CartProductModal>> wishlistsStream(String uid){
       });
 }
 
+Stream<double> reviewStream(String uid, String id, String productId){
+ var db = firestore.collection('users').doc(uid).collection('to_ship');
+ return db.doc(id).snapshots().map((event) {
+    var data = event.data() ?? {};
+    List<dynamic> value = data['products'] ?? [];
+    var list =
+        value.where((element) => element['id'] == productId).toList();
+    var dataList = list[0]['reviews'] ?? {};
+    var reviews = dataList[uid];
+    return reviews ?? 0.0;
+  });
+}
+
+
+Future<void> addReviews(String uid,double ratingByUser, String productId , OrdersModals orderModel)async{
+
+var db= firestore.collection('products');
+var userDb= firestore.collection('users');
+var get=await db.doc(productId).get();
+var data= get.data()??{};
+ double totalRatingSum = data['totalRatingSum'] ?? 0.0;
+    int totalUsersRated = (data['totalUsersRated'] ?? 0).toInt();
+    Map<String, dynamic> reviews = data['reviews']??{};
+      bool userHasRated = reviews.containsKey(uid);
+    double oldUserRating = userHasRated ? reviews[uid] : 0.0;
+
+    if (userHasRated) {
+      
+      totalRatingSum = totalRatingSum - oldUserRating + ratingByUser;
+      reviews[uid] = ratingByUser;
+    } else {
+      
+      totalRatingSum += ratingByUser;
+      totalUsersRated += 1;
+      reviews[uid] = ratingByUser;
+    }
+
+
+    double averageRating =(totalUsersRated>0)? totalRatingSum / totalUsersRated:0.0;
+    
+
+    await db.doc(productId).update({
+      'totalRatingSum': totalRatingSum,
+      'totalUsersRated': totalUsersRated,
+      'averageRating': averageRating,
+      'reviews': reviews,
+    });
+
+var getUser= await userDb.doc(uid).collection('to_ship').doc(orderModel.id).get();
+var userData= getUser.data()??{};
+List<Map<String, dynamic>> list= List.from(userData['products']??[]);
+log('$list');
+List<Map<String, dynamic>> newList=[];
+for (var element in list) {
+  if (element['id']==productId) {
+    log('true');
+    newList.add({
+      ...element,
+      'totalRatingSum': totalRatingSum,
+      'totalUsersRated': totalUsersRated,
+      'averageRating': averageRating,
+      'reviews': reviews,});
+  }else{
+
+    newList.add(element);
+  }
+}
+log('$newList');
+await  userDb.doc(uid).collection('to_ship').doc(orderModel.id).update({
+'products':newList
+});
+}
+
+
 Stream<List<ProductModal>> getProductByBrand(String brand){
   var db = firestore.collection('products');
  if (brand == '') {

@@ -129,6 +129,22 @@ Stream<List<CartProductModal>> wishlistStream(){
   }
 }
 
+Future<void> addReviews(double ratingByUser, String productId, OrdersModals orderModel )async{
+  String uid = authService.firebaseAuth.currentUser!.uid;
+  try {
+    await userDbServices.addReviews(uid, ratingByUser, productId, orderModel);
+  }on FirebaseException catch (e) {
+    throw Exception(e.code);
+  }
+}
+Stream<double> reviewsStream(String id, String productId){
+  String uid = authService.firebaseAuth.currentUser!.uid;
+  try {
+    return userDbServices.reviewStream(uid, id, productId);
+  }on FirebaseException catch (e) {
+    throw Exception(e.code);
+  }
+}
 Future<void> cancelorder(String id ,List<CartProductModal> cartList)async{
   String uid = authService.firebaseAuth.currentUser!.uid;
 try{
