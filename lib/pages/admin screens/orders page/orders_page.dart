@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/order%20delivery%20status%20stream%20riverpod/order_delivery_status_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/order_delivery_status_riverpod.dart';
 import 'package:sneak_peak/controllers/cross%20fade%20anim%20riverpod/cross_fade_anim_riverpod.dart';
 import 'package:sneak_peak/models/cart_poduct_modal.dart';
 import 'package:sneak_peak/pages/admin%20screens/orders%20page/controllers/orders_stream_riverpod.dart';
@@ -90,7 +90,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                               leading: Container(
                                 height: 50,
                                 width: 50,
-
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
                                 alignment: Alignment.center,
                                 decoration: ShapeDecoration(
                                   color: Colors.grey.withAlpha(100),
@@ -103,6 +103,7 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                                               list[index]
                                                   .productsList![0]
                                                   .img![0],
+                                          
                                         )
                                         : const Text(
                                           'Sold out',

@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,8 +13,7 @@ class ToShipNoDataWdget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     print('To ship no data WIDGET BUILD CALLED');
-    var auth = FirebaseAuth.instance.currentUser;
-    var stream = ref.watch(toShipStreamProvider(auth!.uid));
+    var stream = ref.watch(toShipStreamProvider);
     var streamList = stream.value ?? [];
     var list =
         streamList

@@ -1,13 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/banners%20riverpod/banners_riverpod.dart';
-import 'package:sneak_peak/models/caraousels_banners_model.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/banners_riverpod.dart';
+import 'package:sneak_peak/controllers/banners_stream.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 
 class CaraouselWidget extends StatelessWidget {
   const CaraouselWidget({super.key});
@@ -66,16 +66,13 @@ class CaraouselWidget extends StatelessWidget {
                                         Align(
                                           alignment: Alignment.topRight,
                                           child: IconButton(
-                                            onPressed: () {
-                                              ref
-                                                  .read(
-                                                    caraouselSliderImagesProvider
-                                                        .notifier,
-                                                  )
-                                                  .deleteBanners(
-                                                    data[index].id.toString(),
-                                                    contextX,
-                                                  );
+                                            onPressed: ()async{
+                         loadingDialog(contextX, 'Deleting image...');
+                         var isDeleted= await ref.read(caraouselSliderImagesProvider.notifier,).deleteBanners(data[index].id.toString(),data[index].caraouselImagesPaths??'');
+                         Navigator.pop(contextX);
+                         if (isDeleted) {
+                         SnackBarHelper.show('Deleted successfully');
+                         }
                                             },
                                             icon: const Icon(
                                               Icons.cancel,
@@ -124,12 +121,4 @@ class CaraouselWidget extends StatelessWidget {
   }
 }
 
-final bannersProvider = StreamProvider<List<CaraouselsBannersModel>>((ref) {
-  var db = FirebaseFirestore.instance.collection('banners');
-  return db.snapshots().map(
-    (event) =>
-        event.docs
-            .map((e) => CaraouselsBannersModel.fromMap(e.data()))
-            .toList(),
-  );
-});
+

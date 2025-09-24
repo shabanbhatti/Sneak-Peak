@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sneak_peak/controllers/auth%20riverpod/auth_riverpod.dart';
 import 'package:sneak_peak/controllers/user%20img%20riverpod/user_img_riverpod.dart';
 import 'package:sneak_peak/pages/admin%20screens/theme%20page/admin_theme_page.dart';
+import 'package:sneak_peak/pages/auth%20pages/login%20page/login_page.dart';
 import 'package:sneak_peak/pages/user%20screens/cancellation%20page/cancellation_page.dart';
 import 'package:sneak_peak/pages/user%20screens/completed%20orders%20page/completed_orders_page.dart';
 import 'package:sneak_peak/pages/user%20screens/pending%20order%20page/pending_orders_page.dart';
@@ -13,6 +14,8 @@ import 'package:sneak_peak/pages/user%20screens/profile%20page/widgets/top_profi
 import 'package:sneak_peak/pages/user%20screens/settings%20page/settings_page.dart';
 import 'package:sneak_peak/pages/user%20screens/to%20ship%20page/to_ship_page.dart';
 import 'package:sneak_peak/pages/user%20screens/wishlist%20page/wishlist_page.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -27,13 +30,26 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     super.initState();
     
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(userImgProvider.notifier).getUserImg(context);
-      ref.read(authProvider.notifier).syncEmailAfterVerification(context);
+      ref.read(userImgProvider('user_img').notifier).getUserImg();
+      ref.read(authProvider('sync_email').notifier).syncEmailAfterVerification();
     },);
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(authProvider('logout_user'), (previous, next) {
+      if (next is AuthErrorState) {
+        var error= next.error;
+        Navigator.pop(context);
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    },);
+     ref.listen(userImgProvider('user_img'), (previous, next) {
+     if(next is ErrorStateUserImg){
+        var error= next.error;
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    },);
     return Scaffold(
       body: Center(
         child: CustomScrollView(
@@ -141,8 +157,13 @@ Widget _signOut(WidgetRef ref, BuildContext context) {
     padding: EdgeInsets.symmetric(vertical: 5),
     sliver: SliverToBoxAdapter(
       child: TextButton(
-        onPressed: () {
-          ref.read(authProvider.notifier).logout(context);
+        onPressed: ()async {
+          loadingDialog(context, 'Logging out....');
+         var isLogout= await ref.read(authProvider('logout_user').notifier).logout();
+         Navigator.pop(context);
+          if (isLogout) {
+             GoRouter.of(context).goNamed(LoginPage.pageName);
+          }
         },
         child: Text(
           'Sign out',

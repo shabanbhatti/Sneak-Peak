@@ -3,8 +3,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/add%20product%20colors%20riverpod/add_colors_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/products%20firebase%20riverpod/product_firebase_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/add_colors_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/product_db_riverpod.dart';
 
 void showRemoveItemDialog(BuildContext context, void Function() onDel) {
   showDialog(

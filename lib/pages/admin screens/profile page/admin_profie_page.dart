@@ -8,7 +8,10 @@ import 'package:sneak_peak/controllers/user%20img%20riverpod/user_img_riverpod.d
 import 'package:sneak_peak/pages/admin%20screens/completed%20orders%20page/admin_completed_orders_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/edit%20name%20page/admin_edit_name_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/theme%20page/admin_theme_page.dart';
+import 'package:sneak_peak/pages/auth%20pages/login%20page/login_page.dart';
 import 'package:sneak_peak/utils/constant_imgs.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/admin%20app%20bar/admin_app_bar.dart';
 import 'package:sneak_peak/widgets/circle%20avatar%20widget/circle_avatar_widget.dart';
 import 'package:sneak_peak/widgets/list%20tile%20widget/list_tile_widget.dart';
@@ -26,13 +29,26 @@ class _ProfilePageState extends ConsumerState<AdminProfilePage> {
     super.initState();
     print('INIT CALLED');
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(userImgProvider.notifier).getUserImg(context);
+      ref.read(userImgProvider('admin_img').notifier).getUserImg();
       ref.read(getSharedPrefDataProvider.notifier).getNameEmailDataFromSP();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(authProvider('logout'), (previous, next) {
+      if (next is AuthErrorState) {
+        var error= next.error;
+        Navigator.pop(context);
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    },);
+    ref.listen(userImgProvider('admin_img'), (previous, next) {
+       if(next is ErrorStateUserImg){
+        var error= next.error;
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    },);
     return Scaffold(
       appBar: adminAppBar('Profile'),
       body: SingleChildScrollView(
@@ -105,8 +121,13 @@ class _ProfilePageState extends ConsumerState<AdminProfilePage> {
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                 TextButton(
-                  onPressed: () {
-                    ref.read(authProvider.notifier).logout(context);
+                  onPressed: ()async{
+                    loadingDialog(context, 'Logging out....');
+                     var isLogOut= await ref.read(authProvider('logout').notifier).logout();
+                       Navigator.pop(context);
+                       if (isLogOut) {
+                          GoRouter.of(context).goNamed(LoginPage.pageName);
+                       }
                   },
                   child: const Text(
                     'Sign out',
@@ -130,14 +151,19 @@ class _ProfilePageState extends ConsumerState<AdminProfilePage> {
   Widget _profilePic() {
     return Consumer(
       builder: (context, userImgRef, child) {
-        var userImg = userImgRef.watch(userImgProvider);
+        var userImg = userImgRef.watch(userImgProvider('admin_img'));
         if (userImg is LoadedSuccessfulyUserImg) {
           return CircleAvatarWidget(
             imgUrl: userImg.imgUrl,
             onTap:
-                () => ref
-                    .read(userImgProvider.notifier)
-                    .takeImage(ImageSource.gallery, context),
+                ()async{
+                  loadingDialog(context, 'Uploading image...');
+                 var isDone= await ref.read(userImgProvider('admin_img').notifier).takeImage(ImageSource.gallery,);
+                  Navigator.pop(context);
+                  if (isDone=='done') {
+                    SnackBarHelper.show('Image uploaded successfully');
+                  }
+                }
           );
         } else if (userImg is LoadingUserImg) {
           return CircleAvatarWidget(
@@ -149,9 +175,14 @@ class _ProfilePageState extends ConsumerState<AdminProfilePage> {
           return CircleAvatarWidget(
             imgUrl: profileIconUrl,
             onTap:
-                () => ref
-                    .read(userImgProvider.notifier)
-                    .takeImage(ImageSource.gallery, context),
+                ()async{
+                  loadingDialog(context, 'Uploading image...');
+                  var isDone= await ref.read(userImgProvider('admin_img').notifier).takeImage(ImageSource.gallery,);
+                   Navigator.pop(context);
+                    if (isDone=='done') {
+                    SnackBarHelper.show('Image uploaded successfully');
+                  }
+                }
           );
         }
       },

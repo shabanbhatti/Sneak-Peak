@@ -4,19 +4,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/add%20product%20colors%20riverpod/add_colors_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/drop%20down%20menu%20riverpod/drop_down_menu_rierpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/gender%20selection%20riverpod/gender_selection_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/products%20firebase%20riverpod/product_firebase_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/shoes%20sizes%20riverpod/shoes_sizes_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/updated%20product%20imgs%20riverpod%20(img%20picker)/updated_product_imgs_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/add_colors_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/drop_down_menu_rierpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/gender_selection_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/product_db_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/shoes_sizes_riverpod.dart';
 import 'package:sneak_peak/models/products_modals.dart';
 import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/Widgets/circle_size_widget.dart';
 import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/Widgets/colors_widget.dart';
 import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/Widgets/gender_btns.dart';
 import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/Widgets/size_widget.dart';
 import 'package:sneak_peak/pages/admin%20screens/admin_main.dart';
+import 'package:sneak_peak/pages/admin%20screens/update%20product%20page/controllers/update_product_img_controller.dart';
+import 'package:sneak_peak/pages/admin%20screens/update%20product%20page/controllers/update_stream_controller.dart';
 import 'package:sneak_peak/pages/admin%20screens/update%20product%20page/widgets/update_product_img_widget.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/shoes_brands_list.dart';
 import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
@@ -67,7 +69,7 @@ class _UpdateProductPageState extends ConsumerState<AdminUpdateProductPage> {
     Future.microtask(
       () => ref
           .read(dropDownMenuProvider.notifier)
-          .addValue(widget.productModal.brand??''),
+          .addValue(widget.productModal.brand ?? ''),
     );
     initializeAll();
   }
@@ -75,16 +77,15 @@ class _UpdateProductPageState extends ConsumerState<AdminUpdateProductPage> {
   void initializeAll() {
     try {
       gendersFetch();
-      titleController.text = widget.productModal.title??'';
-      desController.text = widget.productModal.description??'';
-      priceController.text = widget.productModal.price??'';
+      titleController.text = widget.productModal.title ?? '';
+      desController.text = widget.productModal.description ?? '';
+      priceController.text = widget.productModal.price ?? '';
       colorsFetch();
       sizeFetch();
     } catch (e) {
       print(e);
     }
   }
-
 
   void colorsFetch() async {
     await Future.wait(
@@ -99,22 +100,17 @@ class _UpdateProductPageState extends ConsumerState<AdminUpdateProductPage> {
     );
   }
 
-void sizeFetch()async{
-
-Future.wait(widget.productModal.shoesSizes!.map((e) async{
-  Future.microtask(() {
-    print(e);
-    ref.read(checkedBtnProvider1(e).notifier).isCheckedMeth1(true);
-ref.read(shoesSizesProvider.notifier).addSize(e);
-  },);
-    
-
-  
-
-},));
-
-
-}
+  void sizeFetch() async {
+    Future.wait(
+      widget.productModal.shoesSizes!.map((e) async {
+        Future.microtask(() {
+          print(e);
+          ref.read(checkedBtnProvider1(e).notifier).isCheckedMeth1(true);
+          ref.read(shoesSizesProvider.notifier).addSize(e);
+        });
+      }),
+    );
+  }
 
   void gendersFetch() async {
     await Future.wait(
@@ -122,8 +118,7 @@ ref.read(shoesSizesProvider.notifier).addSize(e);
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
           ref.read(checkedBtnProvider(e).notifier).isCheckedMeth(true);
           ref.read(genderSelectionProvider.notifier).addGenders(e);
-        },);
-       
+        });
       }),
     );
   }
@@ -158,14 +153,14 @@ ref.read(shoesSizesProvider.notifier).addSize(e);
                   var streamImgs =
                       streamProductImgRef
                           .watch(
-                            dbImagesStreamProvider(
+                            productModelStreamProviderForUpdateAdminPage(
                               widget.productModal.id.toString(),
                             ),
                           )
                           .value;
                   return SmootPageIndicatorWidget(
                     pageController: pageController,
-                    count: streamImgs?.length ?? [].length,
+                    count: streamImgs?.img?.length ?? [].length,
                   );
                 },
               ),
@@ -204,7 +199,7 @@ ref.read(shoesSizesProvider.notifier).addSize(e);
                             dropDownRef
                                 .read(dropDownMenuProvider.notifier)
                                 .addValue(value!);
-                                log(value);
+                            log(value);
                           },
                           value: value,
                         );
@@ -215,7 +210,7 @@ ref.read(shoesSizesProvider.notifier).addSize(e);
               ),
             ),
             const GenderBtns(),
-             SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: Consumer(
                 builder: (context, x, child) {
                   var selectedGender = x.watch(genderSelectionProvider);
@@ -260,18 +255,23 @@ ref.read(shoesSizesProvider.notifier).addSize(e);
     return Consumer(
       builder: (context, x, child) {
         var streamImgList = x.watch(
-          dbImagesStreamProvider(widget.productModal.id.toString()),
+          productModelStreamProviderForUpdateAdminPage(
+            widget.productModal.id.toString(),
+          ),
         );
         var streamList =
             x
                 .watch(
-                  dbImagesStreamProvider(widget.productModal.id.toString()),
+                  productModelStreamProviderForUpdateAdminPage(
+                    widget.productModal.id.toString(),
+                  ),
                 )
-                .value;
+                .value ??
+            ProductModal();
         return CustomSliverAppBar1(
           title: 'Update product',
           leadingOnTap: () {
-            if (streamList!.isEmpty || streamImgList.isLoading) {
+            if (streamList.img!.isEmpty || streamImgList.isLoading) {
               SnackBarHelper.show('Upload the image', color: Colors.red);
             } else {
               ref.invalidate(shoesSizesProvider);
@@ -281,10 +281,17 @@ ref.read(shoesSizesProvider.notifier).addSize(e);
           },
           leadingIcon: CupertinoIcons.back,
           trailingIcon: CupertinoIcons.photo,
-          onTrailingTap:
-              () => ref
-                  .read(updateProductImgProvider.notifier)
-                  .takeImage(widget.productModal.id.toString(), context),
+          onTrailingTap: () async {
+            loadingDialog(context, 'Uploading image...');
+            await ref
+                .read(updateProductImgProvider.notifier)
+                .takeImage(
+                  widget.productModal.id.toString(),
+                  widget.productModal.img ?? [],
+                  widget.productModal.storageImgsPath ?? [],
+                );
+            Navigator.pop(context);
+          },
         );
       },
     );
@@ -375,21 +382,24 @@ ref.read(shoesSizesProvider.notifier).addSize(e);
         child: Consumer(
           builder: (context, buttonRef, child) {
             var streamUpdateImg = buttonRef.watch(
-              dbImagesStreamProvider(widget.productModal.id.toString()),
+              productModelStreamProviderForUpdateAdminPage(
+                widget.productModal.id.toString(),
+              ),
             );
             var streamUpdateImgList =
                 buttonRef
                     .watch(
-                      dbImagesStreamProvider(widget.productModal.id.toString()),
+                      productModelStreamProviderForUpdateAdminPage(
+                        widget.productModal.id.toString(),
+                      ),
                     )
-                    .value;
+                    .value ??
+                ProductModal();
             var colors = buttonRef.watch(addProductColorProvider);
             var genderList = buttonRef.watch(genderSelectionProvider);
-            var productToFirstore = buttonRef.watch(
-              addProductToFirestoreProvider,
-            );
-            var brand= buttonRef.watch(dropDownMenuProvider);
-            
+            var productToFirstore = buttonRef.watch(productDbProvider);
+            var brand = buttonRef.watch(dropDownMenuProvider);
+
             return CustomButton(
               btnTitleWidget:
                   (streamUpdateImg.isLoading ||
@@ -403,16 +413,22 @@ ref.read(shoesSizesProvider.notifier).addSize(e);
                 var titleValidation = titleKey.currentState!.validate();
                 var desValidation = desKey.currentState!.validate();
                 var priceValidation = priceKey.currentState!.validate();
-                var shoesSizesList=await buttonRef.read(shoesSizesProvider.notifier).addToSHoesList();
+                var shoesSizesList =
+                    await buttonRef
+                        .read(shoesSizesProvider.notifier)
+                        .addToSHoesList();
 
                 if (titleValidation &&
                     desValidation &&
                     priceValidation &&
-                    streamUpdateImgList!.isNotEmpty &&
+                    streamUpdateImgList.img!.isNotEmpty &&
                     colors.isNotEmpty &&
-                    genderList.isNotEmpty&& brand!.isNotEmpty&& shoesSizesList.isNotEmpty) {
-                  await ref
-                      .read(addProductToFirestoreProvider.notifier)
+                    genderList.isNotEmpty &&
+                    brand!.isNotEmpty &&
+                    shoesSizesList.isNotEmpty) {
+                  loadingDialog(context, 'Updating product...');
+                  var isUpdated = await ref
+                      .read(productDbProvider.notifier)
                       .updateProduct(
                         ProductModal(
                           title: titleController.text.trim(),
@@ -422,15 +438,17 @@ ref.read(shoesSizesProvider.notifier).addSize(e);
                           brand: brand,
                           genders: genderList.toList(),
                           id: widget.productModal.id,
-                          shoesSizes: shoesSizesList
+                          shoesSizes: shoesSizesList,
                         ),
-                        context,
-                      ).then((value) {
-                         ref.invalidate(shoesSizesProvider);
-              ref.invalidate(checkedBtnProvider1);
-                      },);
-
-                  // print(twoList.imgLinkList);
+                      );
+                      Navigator.pop(context);
+                  if (isUpdated) {
+                    
+                    SnackBarHelper.show('Product updated successfuly');
+                    ref.invalidate(shoesSizesProvider);
+                    ref.invalidate(checkedBtnProvider1);
+                    GoRouter.of(context).goNamed(AdminMain.pageName);
+                  }
                 } else {
                   SnackBarHelper.show('Null fields found', color: Colors.red);
                 }

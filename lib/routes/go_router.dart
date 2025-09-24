@@ -12,7 +12,7 @@ import 'package:sneak_peak/pages/admin%20screens/completed%20orders%20page/admin
 import 'package:sneak_peak/pages/admin%20screens/edit%20name%20page/admin_edit_name_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/theme%20page/admin_theme_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/update%20product%20page/update_product_page.dart';
-import 'package:sneak_peak/pages/admin%20screens/view%20order%20page/view_admin_order_page.dart';
+import 'package:sneak_peak/pages/admin%20screens/view%20order%20page%20from%20settings/view_admin_order_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/view%20orders%20page/view_orders_page.dart';
 import 'package:sneak_peak/pages/auth%20pages/forgot%20pass%20page/forgot_pass_page.dart';
 import 'package:sneak_peak/pages/auth%20pages/login%20page/login_page.dart';
@@ -42,7 +42,7 @@ import 'package:sneak_peak/pages/user%20screens/wishlist%20page/wishlist_page.da
 
 class AppGoRouter {
   static GoRouter goRouter = GoRouter(
-    initialLocation: '/firebase_noti',
+    initialLocation: '/intro',
 
     routes: [
       GoRoute(

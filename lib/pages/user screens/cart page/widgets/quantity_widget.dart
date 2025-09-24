@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sneak_peak/controllers/users%20controller/product%20quantity%20riverpod/product_quantity_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/product_quantity_riverpod.dart';
 import 'package:sneak_peak/models/cart_poduct_modal.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/this%20controllers/check_and_selected_data_list_riverpod.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 
 class QuantityCartWidget extends ConsumerWidget {
   const QuantityCartWidget(this.cartModal, {super.key});
@@ -28,7 +29,7 @@ class QuantityCartWidget extends ConsumerWidget {
             Expanded(
               flex: 5,
               child: GestureDetector(
-                onTap: () {
+                onTap: () async{
                   if (isChecked) {
                     ref
                         .read(itemCheckProvider(cartModal.id ?? '').notifier)
@@ -37,14 +38,9 @@ class QuantityCartWidget extends ConsumerWidget {
                         .read(selectedDataList.notifier)
                         .toggeled(false, cartModal);
                   }
-                  ref
-                      .read(quantityAddRemoveProvider.notifier)
-                      .decreaseNumber(
-                        cartModal.id ?? '',
-                        cartModal.quantity ?? 1,
-                        int.parse(cartModal.price!),
-                        context,
-                      );
+                    loadingDialog(context, '', color: Colors.transparent);
+                   await ref.read(productQuantityProvider.notifier).decrement(cartModal.id ?? '',cartModal.quantity ?? 1,int.parse(cartModal.price!),);
+                  Navigator.pop(context);
                 },
                 child: Icon(
                   Icons.remove_circle,
@@ -72,7 +68,7 @@ class QuantityCartWidget extends ConsumerWidget {
             Expanded(
               flex: 5,
               child: GestureDetector(
-                onTap: () {
+                onTap: ()async {
                   if (isChecked) {
                     ref
                         .read(selectedDataList.notifier)
@@ -81,14 +77,10 @@ class QuantityCartWidget extends ConsumerWidget {
                         .read(itemCheckProvider(cartModal.id ?? '').notifier)
                         .state = false;
                   }
-                  ref
-                      .read(quantityAddRemoveProvider.notifier)
-                      .addNumber(
-                        cartModal.id ?? '',
-                        cartModal.quantity ?? 1,
-                        int.parse(cartModal.price!),
-                        context,
-                      );
+                    loadingDialog(context, '', color: Colors.transparent);
+                   await ref.read(productQuantityProvider.notifier).increment(cartModal.id ?? '',cartModal.quantity ?? 1,int.parse(cartModal.price!),);
+                  Navigator.pop(context);
+                  
                 },
                 child: Icon(
                   Icons.add_circle,

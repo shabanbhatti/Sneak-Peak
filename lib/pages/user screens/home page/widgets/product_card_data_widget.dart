@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/users%20controller/home%20&%20see%20all%20pages%20riverpods/get%20products%20family%20stream%20riverpod/get_product_family_stream_riverpod.dart';
-import 'package:sneak_peak/controllers/users%20controller/search%20product%20in%20home%20riverpod/search_product_in_home_riverpod.dart';
-import 'package:sneak_peak/controllers/users%20controller/wishlist%20riverpod/wishlist_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/get_product_family_stream_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/search_product_in_home_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/wishlist_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/view%20product%20page/view_product_page.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/custom%20card%20widget/custom_card_widget.dart';
 import 'package:sneak_peak/widgets/custom%20card%20widget/loading_card_widget.dart';
 
@@ -25,7 +27,7 @@ class ProductCardDataWidget extends ConsumerWidget {
       builder: (context, x, child) {
         var productDataStream = x.watch(streamsProductDataProvider(dataTitle));
         var productList = x.watch(userHomeSearchProductProvider(dataTitle));
-
+        
         return productDataStream.when(
           data:
               (data) =>
@@ -65,14 +67,13 @@ class ProductCardDataWidget extends ConsumerWidget {
                                               as Map<String, dynamic>,
                                     );
                                   },
-                                  onRemove: () {
-                                    x
-                                        .read(
-                                          wishlistProvider(
-                                            productList[index].id.toString(),
-                                          ).notifier,
-                                        )
-                                        .addToWishlist(data[index], context);
+                                  onRemove: ()async{
+                                   loadingDialog(context, 'Processing wishlist...');
+                                var isDone= await x.read(wishlistProvider(productList[index].id.toString(),).notifier,).addToWishlist(data[index]);
+                                Navigator.pop(context);
+                                if (isDone==false) {
+                                  SnackBarHelper.show('Something went wrong', color: Colors.red);
+                                }
                                   },
                                   icon:
                                       (x.watch(

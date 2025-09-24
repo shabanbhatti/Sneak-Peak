@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/add%20product%20colors%20riverpod/add_colors_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/add_colors_riverpod.dart';
 import 'package:sneak_peak/utils/colors&names_records.dart';
 import 'package:sneak_peak/widgets/custom%20colors%20collection/custom_colors_collection.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/gender%20selection%20riverpod/gender_selection_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/shoes%20sizes%20riverpod/shoes_sizes_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/gender_selection_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/shoes_sizes_riverpod.dart';
 import 'package:sneak_peak/utils/male_female_kids_record.dart';
 import 'package:sneak_peak/widgets/gender%20cetagory%20collection%20btn/gender_cetagory_cllection_btn.dart';
 

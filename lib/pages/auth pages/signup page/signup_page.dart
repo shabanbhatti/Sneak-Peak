@@ -5,19 +5,21 @@ import 'package:go_router/go_router.dart';
 import 'package:sneak_peak/controllers/auth%20riverpod/auth_riverpod.dart';
 import 'package:sneak_peak/models/auth_modal.dart';
 import 'package:sneak_peak/pages/auth%20pages/login%20page/login_page.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/utils/validations.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
 import 'package:sneak_peak/widgets/custom%20text%20fields/custom_textfields.dart';
 
-class SignupPage extends StatefulWidget {
+class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
   static const pageName = 'signup_page';
 
   @override
-  State<SignupPage> createState() => _SignupPageState();
+  ConsumerState<SignupPage> createState() => _SignupPageState();
 }
 
-class _SignupPageState extends State<SignupPage>
+class _SignupPageState extends ConsumerState<SignupPage>
     with SingleTickerProviderStateMixin {
   late AnimationController animationController;
   late Animation<Offset> slide;
@@ -69,6 +71,15 @@ class _SignupPageState extends State<SignupPage>
   @override
   Widget build(BuildContext context) {
     print('Signup PAGE BUILD CALLED');
+    ref.listen(authProvider('create'), (previous, next) {
+      if (next is AuthErrorState) {
+        var error= next.error;
+        
+        SnackBarHelper.show(error, color: Colors.red);
+      }else if(next is AuthLoadedSuccessfulyState){
+        SnackBarHelper.show('Verification link has to your email in the spam folder. Please verify!', duration: const Duration(seconds: 5));
+      }
+    },);
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 50,
@@ -77,7 +88,7 @@ class _SignupPageState extends State<SignupPage>
           onPressed: () {
             GoRouter.of(context).goNamed(LoginPage.pageName);
           },
-          icon: Icon(CupertinoIcons.back, size: 40),
+          icon: const Icon(CupertinoIcons.back, size: 40),
         ),
       ),
       body: SafeArea(
@@ -116,16 +127,16 @@ class _SignupPageState extends State<SignupPage>
                   const SizedBox(height: 15),
                   Consumer(
                     builder: (context, authREF, child) {
-                      var auth = authREF.watch(authProvider);
+                      var auth = authREF.watch(authProvider('create'));
                       return CustomButton(
                         btnTitleWidget:
                             (auth is AuthLoadingState)
-                                ? CupertinoActivityIndicator(
+                                ? const CupertinoActivityIndicator(
                                   color: Colors.white,
                                 )
-                                : Text(
+                                : const Text(
                                   'Register',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -143,31 +154,34 @@ class _SignupPageState extends State<SignupPage>
     );
   }
 
-void onRegister(WidgetRef authREF) {
-                          var nameValidation = nameKey.currentState!.validate();
-                          var emailValidation =
-                              emailKey.currentState!.validate();
-                          var passValidation = passKey.currentState!.validate();
-                          var confirmPassValidation =
-                              confirmPassKey.currentState!.validate();
-                          if (nameValidation &&
-                              emailValidation &&
-                              passValidation &&
-                              confirmPassValidation) {
-                            authREF
-                                .read(authProvider.notifier)
-                                .createAccount(
-                                  AuthModal(
-                                    name: nameController.text.trim(),
-                                    email: emailController.text.trim(),
-                                    createdAtDate: DateTime.now().toString(),
-                                  ),
-                                  passController.text.trim(),
-                                  context
-                                );
-                          }
-                        }
-
+  void onRegister(WidgetRef authREF) async {
+    var nameValidation = nameKey.currentState!.validate();
+    var emailValidation = emailKey.currentState!.validate();
+    var passValidation = passKey.currentState!.validate();
+    var confirmPassValidation = confirmPassKey.currentState!.validate();
+    if (nameValidation &&
+        emailValidation &&
+        passValidation &&
+        confirmPassValidation) {
+      loadingDialog(context, 'Creating account...');
+      var isCreated = await authREF
+          .read(authProvider('create').notifier)
+          .createAccount(
+            AuthModal(
+              name: nameController.text.trim(),
+              email: emailController.text.trim(),
+              createdAtDate: DateTime.now().toString(),
+            ),
+            passController.text.trim(),
+          );
+      if (mounted) {
+        Navigator.pop(context);
+        if (isCreated) {
+          GoRouter.of(context).goNamed(LoginPage.pageName);
+        }
+      }
+    }
+  }
 }
 
 Widget _topTitle() {

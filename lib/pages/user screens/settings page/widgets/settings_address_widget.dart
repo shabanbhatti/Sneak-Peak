@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/users%20controller/address%20riverpod/address_riverpd.dart';
+import 'package:sneak_peak/controllers/users%20controller/address_riverpd.dart';
 import 'package:sneak_peak/models/address_modal.dart';
 import 'package:sneak_peak/pages/user%20screens/address%20page/address_page.dart';
 

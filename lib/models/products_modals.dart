@@ -59,17 +59,17 @@ final double? reviews;
 
 
 
-  Map<String, dynamic> toMap(String productId) {
+  Map<String, dynamic> toMap(String productId, List<String> imgList, List<String> imgPaths) {
     return {
       'title': title,
       'description': description,
       'price': price,
-      'images': img,
+      'images': imgList,
       'colors': colors,
       'brand':brand,
       'genders':genders,
       'id': productId,
-      'storage_imgs_paths': storageImgsPath,
+      'storage_imgs_paths': imgPaths,
      'shoes_sizes':shoesSizes,
      'averageRating': reviews,
      'solds': solds

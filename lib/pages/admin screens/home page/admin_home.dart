@@ -1,16 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/banners%20riverpod/banners_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/products%20firebase%20riverpod/product_firebase_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/banners_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/product_db_riverpod.dart';
+import 'package:sneak_peak/controllers/banners_stream.dart';
 import 'package:sneak_peak/controllers/get%20products%20stream%20provider/get_products_stream.dart';
 import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/admin_add_product_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/home%20page/widgets/caraousel_widget.dart';
 import 'package:sneak_peak/pages/admin%20screens/home%20page/widgets/product_data_widget.dart';
-import 'package:sneak_peak/services/shared%20pref%20service/shared_pref_service.dart';
 import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/dialog%20boxes/remove_product_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/admin%20app%20bar/admin_sliver_app_bar.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
 
@@ -31,19 +31,6 @@ class _AdminHomeState extends ConsumerState<AdminHome> {
     Future.microtask(() {});
   }
 
-  Future<void> afterLoginMeth() async {
-    try {
-      var auth = FirebaseAuth.instance.currentUser;
-
-      var email = await SPHelper.setString(SPHelper.email, auth!.email!);
-      var name = await SPHelper.setString(SPHelper.userName, auth.displayName!);
-      print(email);
-      print(name);
-    } catch (e) {
-      print(e);
-    }
-  }
-
   @override
   void dispose() {
     controller.dispose();
@@ -53,6 +40,18 @@ class _AdminHomeState extends ConsumerState<AdminHome> {
   @override
   Widget build(BuildContext context) {
     print('ADMIN HOME BUILD CALLED');
+    ref.listen(productDbProvider, (previous, next) {
+      if (next is ProductErrorState) {
+        var error = next.error;
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    });
+    ref.listen(bannersProvider, (previous, next) {
+      if (next is ErrorCaraouselState) {
+        var e = next.error;
+        SnackBarHelper.show(e.toString(), color: Colors.red);
+      }
+    });
     return Scaffold(
       floatingActionButton: Padding(
         padding: EdgeInsets.all(1),
@@ -87,10 +86,17 @@ class _AdminHomeState extends ConsumerState<AdminHome> {
               child: Center(
                 child: CustomButton(
                   btnTitle: 'Add banners',
-                  onTap:
-                      () => ref
-                          .read(caraouselSliderImagesProvider.notifier)
-                          .takeBanners(context),
+                  onTap: () async {
+                    loadingDialog(context, 'Processing image...');
+                    var isBannerAdd =
+                        await ref
+                            .read(caraouselSliderImagesProvider.notifier)
+                            .addBanner();
+                    Navigator.pop(context);
+                    if (isBannerAdd ?? false) {
+                      SnackBarHelper.show('Added successfully');
+                    }
+                  },
                 ),
               ),
             ),
@@ -103,7 +109,6 @@ class _AdminHomeState extends ConsumerState<AdminHome> {
     );
   }
 }
-
 
 Widget _noProductText() {
   return SliverFillRemaining(
@@ -153,7 +158,7 @@ Widget _deleteAllButton() {
                       removeAllItemsDialog(context, () {
                         loadingDialog(context, 'Deleting all....');
                         xRef
-                            .read(addProductToFirestoreProvider.notifier)
+                            .read(productDbProvider.notifier)
                             .deleteAll(context)
                             .then((value) => Navigator.pop(context));
                         Navigator.pop(context);

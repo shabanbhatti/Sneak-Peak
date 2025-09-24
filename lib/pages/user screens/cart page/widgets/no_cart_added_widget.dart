@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/this%20controllers/cart_stream_provider.dart';
@@ -8,9 +8,8 @@ class NoCartAddedWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-     var auth= FirebaseAuth.instance.currentUser;
-     var stream = ref.watch(cartStreamProvider(auth!.uid));
-var streamList = ref.watch(cartStreamProvider(auth.uid)).value ?? [];
+     var stream = ref.watch(cartStreamProvider);
+var streamList = ref.watch(cartStreamProvider).value ?? [];
     return (streamList.isEmpty&&!stream.isLoading)
         ? const SliverFillRemaining(
           child: Center(

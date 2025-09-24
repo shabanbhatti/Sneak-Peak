@@ -2,10 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/users%20controller/address%20riverpod/address_riverpd.dart';
+import 'package:sneak_peak/controllers/users%20controller/address_riverpd.dart';
 import 'package:sneak_peak/models/address_modal.dart';
 import 'package:sneak_peak/pages/user%20screens/address%20page/widgets/radio_button_widget.dart';
 import 'package:sneak_peak/pages/user%20screens/address%20page/widgets/text_field_address_widget.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
 import 'package:sneak_peak/widgets/custom%20sliver%20app%20bar/custom_sliverappbar.dart';
@@ -59,6 +60,13 @@ class _AddHomeAddressState extends ConsumerState<AddHomeAddress> {
 
   @override
   Widget build(BuildContext context) {
+    print('adress page build called');
+    ref.listen(addressProvider, (previous, next) {
+      if (next is ErrorAddressState) {
+        var error= next.error;
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    },);
     return Scaffold(
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
@@ -153,30 +161,22 @@ class _AddHomeAddressState extends ConsumerState<AddHomeAddress> {
                                     ),
                                   ],
                         ),
-                        onTap: () {
+                        onTap: ()async {
                           if (recipientController.text.isNotEmpty &&
                               addressCetagoy.isNotEmpty &&
                               phoneNumberController.text.isNotEmpty &&
                               cityController.text.isNotEmpty &&
                               regionController.text.isNotEmpty &&
                               addressController.text.isNotEmpty) {
-                            ref
-                                .read(addressProvider.notifier)
-                                .saveAddress(
-                                  AddressModal(
-                                    address: addressController.text.trim(),
-                                    addressCetaory: addressCetagoy,
-                                    city: cityController.text.trim(),
-                                    name: recipientController.text.trim(),
-                                    phoneNumber:
-                                        phoneNumberController.text.trim(),
-                                    region: regionController.text.trim(),
-                                  ),
-                                  context,
-                                )
-                                .then((value) {
-                                  GoRouter.of(context).pop();
-                                });
+                                loadingDialog(context, '', color: Colors.transparent);
+                              var isSave=await ref.read(addressProvider.notifier).saveAddress(AddressModal(address: addressController.text.trim(),addressCetaory: addressCetagoy,city: cityController.text.trim(),name: recipientController.text.trim(),phoneNumber:phoneNumberController.text.trim(),region: regionController.text.trim(),),);
+                               Navigator.pop(context);
+                               if (isSave) {
+                                SnackBarHelper.show('Address added successfuly', color: Colors.green);
+                                 GoRouter.of(context).pop();
+                               }
+                                  
+                                
                           } else {
                             SnackBarHelper.show(
                               'Null fields found',

@@ -4,18 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sneak_peak/controllers/auth%20riverpod/auth_riverpod.dart';
 import 'package:sneak_peak/pages/auth%20pages/login%20page/login_page.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/utils/validations.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
 import 'package:sneak_peak/widgets/custom%20text%20fields/custom_textfields.dart';
 
-class ForgotPasswordPage extends StatefulWidget {
+class ForgotPasswordPage extends ConsumerStatefulWidget {
   const ForgotPasswordPage({super.key});
   static const pageName = 'forgot_password';
   @override
-  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+  ConsumerState<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _ForgotPasswordPageState extends State<ForgotPasswordPage>
+class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage>
     with SingleTickerProviderStateMixin {
   late AnimationController animationController;
   late Animation<Offset> slide;
@@ -49,6 +51,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
 
   @override
   Widget build(BuildContext context) {
+    print('forgot password build called');
+    ref.listen(authProvider('forgot'), (previous, next) {
+      if (next is AuthErrorState) {
+        var error= next.error;
+        
+        SnackBarHelper.show(error, color: Colors.red);
+      }else if(next is AuthLoadedSuccessfulyState){
+        SnackBarHelper.show(
+        'Password reset email sent! Check your inbox.',
+        duration: const Duration(seconds: 10),
+      );
+      }
+    },);
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 50,
@@ -57,7 +72,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
           onPressed: () {
             GoRouter.of(context).goNamed(LoginPage.pageName);
           },
-          icon: Icon(CupertinoIcons.back, size: 40),
+          icon:const Icon(CupertinoIcons.back, size: 40),
         ),
       ),
       body: SingleChildScrollView(
@@ -72,7 +87,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                 const SizedBox(height: 15),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 18),
-                  child: Row(
+                  child:const Row(
                     children: [
                       Text(
                         '* We will send you a link to your email (spam)\n   to reset your new password.',
@@ -84,11 +99,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                 const SizedBox(height: 15),
                 Consumer(
                   builder: (context, ref, child) {
-                    var auth= ref.watch(authProvider);
+                    var auth= ref.watch(authProvider('forgot'));
                     return CustomButton(
-                  btnTitleWidget:(auth is AuthLoadingState)?const CupertinoActivityIndicator(color: Colors.white,) :Text(
+                  btnTitleWidget:(auth is AuthLoadingState)?const CupertinoActivityIndicator(color: Colors.white,) :const Text(
                     'Reset password',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -108,11 +123,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
   }
 
 
-void forgotPass(WidgetRef authRef){
+void forgotPass(WidgetRef authRef)async{
 
 var emailValidation= emailKey.currentState!.validate();
 if (emailValidation) {
-  authRef.read(authProvider.notifier).forgetPassword(emailController.text.trim(), context);
+  loadingDialog(context, 'Reseting your password...');
+  await authRef.read(authProvider('forgot').notifier).forgetPassword(emailController.text.trim(),);
+if (mounted) {
+  Navigator.pop(context);
+ 
+}
 }
 
 }

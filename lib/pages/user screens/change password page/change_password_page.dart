@@ -1,8 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sneak_peak/controllers/auth%20riverpod/auth_riverpod.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/utils/validations.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
 import 'package:sneak_peak/widgets/custom%20sliver%20app%20bar/custom_sliverappbar.dart';
@@ -17,11 +21,9 @@ class ChangePasswordPage extends ConsumerStatefulWidget {
 }
 
 class _ChangePasswordPage extends ConsumerState<ChangePasswordPage> {
-  
   TextEditingController oldPasswordController = TextEditingController();
   TextEditingController newPasswordController = TextEditingController();
 
-  
   GlobalKey<FormState> oldPasswordkey = GlobalKey<FormState>();
   GlobalKey<FormState> newPasswordkey = GlobalKey<FormState>();
 
@@ -34,6 +36,14 @@ class _ChangePasswordPage extends ConsumerState<ChangePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(authProvider('change_password'), (previous, next) {
+      if (next is AuthLoadedSuccessfulyState) {
+        SnackBarHelper.show('Password update successfully');
+      } else if (next is AuthErrorState) {
+        var error = next.error;
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    });
     return Scaffold(
       body: Center(
         child: CustomScrollView(
@@ -44,7 +54,6 @@ class _ChangePasswordPage extends ConsumerState<ChangePasswordPage> {
               leadingIcon: CupertinoIcons.back,
               title: 'Change password',
             ),
-          
 
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
@@ -95,7 +104,7 @@ class _ChangePasswordPage extends ConsumerState<ChangePasswordPage> {
               sliver: SliverToBoxAdapter(
                 child: Consumer(
                   builder: (context, x, _) {
-                    var auth = x.watch(authProvider);
+                    var auth = x.watch(authProvider('change_password'));
                     return CustomButton(
                       btnTitleWidget:
                           (auth is AuthLoadingState)
@@ -104,18 +113,27 @@ class _ChangePasswordPage extends ConsumerState<ChangePasswordPage> {
                                 'Change password',
                                 style: TextStyle(color: Colors.white),
                               ),
-                      onTap: ()async {
-                        
+                      onTap: () async {
                         var isOldPasswordValidate =
                             oldPasswordkey.currentState!.validate();
                         var isNewPasswordValidate =
                             newPasswordkey.currentState!.validate();
-                        if (
-                            isOldPasswordValidate &&
-                            isNewPasswordValidate) {
-                         await ref.read(authProvider.notifier).changePassword(newPasswordController.text.trim(), oldPasswordController.text.trim(), context);
-                         newPasswordController.clear();
-                         oldPasswordController.clear();
+                        if (isOldPasswordValidate && isNewPasswordValidate) {
+                          log('Starting...');
+                          loadingDialog(context, 'Changing to new password...');
+                          var isChanged = await ref
+                              .read(authProvider('change_password').notifier)
+                              .changePassword(
+                                newPasswordController.text.trim(),
+                                oldPasswordController.text.trim(),
+                              );
+                          log('Ending...');
+                          Navigator.pop(context);
+                          if (isChanged) {
+                            newPasswordController.clear();
+                            oldPasswordController.clear();
+                            
+                          }
                         }
                       },
                     );

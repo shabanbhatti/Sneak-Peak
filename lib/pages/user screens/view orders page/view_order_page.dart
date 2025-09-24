@@ -8,6 +8,7 @@ import 'package:sneak_peak/pages/user%20screens/view%20orders%20page/controllers
 import 'package:sneak_peak/pages/user%20screens/view%20orders%20page/widgets/for%20completed%20page/completed_card_widget.dart';
 import 'package:sneak_peak/pages/user%20screens/view%20orders%20page/widgets/for%20to%20ship%20page/view_to_ship_orders_cards.dart';
 import 'package:sneak_peak/utils/constant_steps.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/dialog%20boxes/remove_dialog_.dart';
 import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
@@ -25,7 +26,13 @@ class ViewOrderPage extends ConsumerStatefulWidget {
 class _ViewToShipOrderPageState extends ConsumerState<ViewOrderPage> {
   @override
   Widget build(BuildContext context) {
+    print('view order page build called');
     var list = widget.ordersModals.productsList ?? [];
+    ref.listen(ordersProvider, (previous, next) {
+      if (next != 'loading' && next != 'init' && next != 'done') {
+        SnackBarHelper.show(next, color: Colors.red);
+      }
+    });
     return Scaffold(
       body: Center(
         child: CustomScrollView(
@@ -81,14 +88,24 @@ class _ViewToShipOrderPageState extends ConsumerState<ViewOrderPage> {
                               deleteDialog(
                                 context,
                                 onDel: () async {
-                                  await ref
+                                  Navigator.pop(context);
+                                  loadingDialog(
+                                    context,
+                                    'Cancelling your order...',
+                                  );
+                                  var isDeleted = await ref
                                       .read(ordersProvider.notifier)
                                       .cancelOrder(
-                                        context,
                                         widget.ordersModals.id ?? '',
                                         widget.ordersModals.productsList ?? [],
                                       );
-                                  GoRouter.of(context).pop();
+                                  Navigator.pop(context);
+                                  if (isDeleted) {
+                                    SnackBarHelper.show(
+                                      'Order cancel successfuly',
+                                    );
+                                    GoRouter.of(context).pop();
+                                  }
                                 },
                                 title: 'Cancel Order?',
                                 descripton: 'Wanna cancel your order',

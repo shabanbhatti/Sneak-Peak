@@ -8,10 +8,12 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sneak_peak/controllers/get%20shared%20pref%20data%20riverpod/get_sp_data_riverpod.dart';
 import 'package:sneak_peak/controllers/location%20riverpod/location_riverpod.dart';
 import 'package:sneak_peak/controllers/user%20img%20riverpod/user_img_riverpod.dart';
-import 'package:sneak_peak/controllers/users%20controller/home%20&%20see%20all%20pages%20riverpods/get%20products%20family%20stream%20riverpod/get_product_family_stream_riverpod.dart';
-import 'package:sneak_peak/controllers/users%20controller/search%20product%20in%20home%20riverpod/search_product_in_home_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/get_product_family_stream_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/search_product_in_home_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/view%20user%20img%20page/view_user_img_page.dart';
 import 'package:sneak_peak/utils/constant_imgs.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 
 
 class HomeAppBarWidget extends ConsumerStatefulWidget {
@@ -27,11 +29,17 @@ class _HomeAppBarWidgetState extends ConsumerState<HomeAppBarWidget> {
 @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(userImgProvider.notifier).getUserImg(context));
+    Future.microtask(() => ref.read(userImgProvider('user_img_home').notifier).getUserImg());
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(userImgProvider('user_img_home'), (previous, next) {
+      if(next is ErrorStateUserImg){
+        var error= next.error;
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    },);
     return SliverAppBar(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       expandedHeight: 170,
@@ -44,7 +52,7 @@ class _HomeAppBarWidgetState extends ConsumerState<HomeAppBarWidget> {
               child: ListTile(
                 leading: Consumer(
                   builder: (context, x, child) {
-                    var userImg = x.watch(userImgProvider);
+                    var userImg = x.watch(userImgProvider('user_img_home'));
                     return (userImg is LoadingUserImg)
                         ? _circleAvatarWidget(
                           loadingGifUrl,
@@ -58,20 +66,26 @@ class _HomeAppBarWidgetState extends ConsumerState<HomeAppBarWidget> {
                                 ViewUserImgPage.pageName,
                                 extra: userImg.imgUrl,
                               ),
-                          child: _circleAvatarWidget(userImg.imgUrl, () {
+                          child: _circleAvatarWidget(userImg.imgUrl, ()async {
                             if (userImg.imgUrl == profileIconUrl) {
-                              x
-                                  .read(userImgProvider.notifier)
-                                  .takeImage(ImageSource.gallery, context);
+                              loadingDialog(context, 'Uploading image...');
+                              var isDone= await x.read(userImgProvider('user_img_home').notifier).takeImage(ImageSource.gallery, );
+                                  Navigator.pop(context);
+                                   if (isDone=='done') {
+                    SnackBarHelper.show('Image uploaded successfully');
+                  }
                             }
                           }),
                         )
                         : _circleAvatarWidget(
                           profileIconUrl,
-                          () {
-                            x
-                                .read(userImgProvider.notifier)
-                                .takeImage(ImageSource.gallery, context);
+                          ()async {
+                            loadingDialog(context, 'Uploading image...');
+                           var isDone= await x.read(userImgProvider('user_img_home').notifier).takeImage(ImageSource.gallery, );
+                                Navigator.pop(context);
+                                 if (isDone=='done') {
+                    SnackBarHelper.show('Image uploaded successfully');
+                  }
                           },
                         );
                   },

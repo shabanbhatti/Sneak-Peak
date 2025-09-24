@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sneak_peak/controllers/users%20controller/cart%20riverpod/cart_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/cart_riverpod.dart';
 import 'package:sneak_peak/models/products_modals.dart';
 import 'package:sneak_peak/pages/user%20screens/selection%20page/selection_page.dart';
 import 'package:sneak_peak/pages/user%20screens/view%20product%20page/view_product_page.dart';

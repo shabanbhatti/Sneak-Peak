@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/users%20controller/cart%20riverpod/cart_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/cart_riverpod.dart';
 import 'package:sneak_peak/models/cart_poduct_modal.dart';
 import 'package:sneak_peak/models/products_modals.dart';
 import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/Widgets/circle_size_widget.dart';
@@ -13,7 +13,9 @@ import 'package:sneak_peak/pages/user%20screens/view%20product%20page/this%20con
 import 'package:sneak_peak/pages/user%20screens/view%20product%20page/widgets/color_collection_widget.dart';
 import 'package:sneak_peak/utils/colors&names_records.dart';
 import 'package:sneak_peak/utils/dialog%20boxes/error_dialog.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/price_format.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
 
 void selectionBottomSheet(
@@ -249,7 +251,7 @@ Widget _bottomBtn(ProductModal productModal, String buyOrCart) {
             child:
                 (buyOrCart == 'CART')
                     ? CustomButton(
-                      onTap: () {
+                      onTap: ()async {
                         if (shoesSize != null && color.isNotEmpty) {
                           var pM = ProductModal(
                             id: productModal.id,
@@ -263,9 +265,13 @@ Widget _bottomBtn(ProductModal productModal, String buyOrCart) {
                             title: productModal.title,
                             shoesSizes: [shoesSize ?? 0],
                           );
-                          x
-                              .read(cartProvider.notifier)
-                              .addToCartBtnClick(pM, context);
+                         loadingDialog(context, 'Adding to cart...');
+                          var isCarted= await x.read(cartProvider.notifier).addToCartBtnClick(pM,);
+                          Navigator.pop(context);
+                          if (isCarted) {
+                            SnackBarHelper.show('Add to cart successfuly');
+                            Navigator.pop(context);
+                          }
                         } else {
                           errorDialog(
                             context,

@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/add%20product%20colors%20riverpod/add_colors_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/drop%20down%20menu%20riverpod/drop_down_menu_rierpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/gender%20selection%20riverpod/gender_selection_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/picking%20product%20imgs%20riverpod%20(img%20picker)/pickng_product_imgs.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/products%20firebase%20riverpod/product_firebase_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/shoes%20sizes%20riverpod/shoes_sizes_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/add_colors_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/drop_down_menu_rierpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/gender_selection_riverpod.dart';
+import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/controllers/add_product_picking_imgs_controller.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/product_db_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/shoes_sizes_riverpod.dart';
 import 'package:sneak_peak/models/products_modals.dart';
 import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/Widgets/circle_size_widget.dart';
 import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/Widgets/colors_widget.dart';
@@ -23,7 +23,6 @@ import 'package:sneak_peak/widgets/custom%20sliver%20app%20bar/custom_sliverappb
 import 'package:sneak_peak/widgets/custom%20smooth%20page%20indicator%20widget/smoot_page_indicator_widget.dart';
 import 'package:sneak_peak/widgets/custom%20text%20fields/custom_textfields.dart';
 import 'package:sneak_peak/widgets/drop%20down%20menu%20widget/drop_down_menu_.dart';
-import 'package:sneak_peak/widgets/gender%20cetagory%20collection%20btn/gender_cetagory_cllection_btn.dart';
 
 class AddProductPage extends ConsumerStatefulWidget {
   const AddProductPage({super.key});
@@ -71,6 +70,7 @@ class _AddProductPageState extends ConsumerState<AddProductPage> {
   @override
   Widget build(BuildContext context) {
     print('ADD PRODUCT BUILD CALLED');
+
     return Scaffold(
       body: Center(
         child: CustomScrollView(
@@ -282,17 +282,15 @@ class _AddProductPageState extends ConsumerState<AddProductPage> {
       child: Center(
         child: Consumer(
           builder: (context, buttonRef, child) {
-            var twoListX = buttonRef.watch(pickingProductImgProvider);
+            var fileList = buttonRef.watch(pickingProductImgProvider);
             var colors = buttonRef.watch(addProductColorProvider);
             var genderList = buttonRef.watch(genderSelectionProvider);
-            var productToFirstore = buttonRef.watch(
-              addProductToFirestoreProvider,
-            );
+            var productToFirstore = buttonRef.watch(productDbProvider);
 
             var dropDownValue = buttonRef.watch(dropDownMenuProvider);
             return CustomButton(
               btnTitleWidget:
-                  (twoListX.isLoading ||
+                  (fileList.isLoading ||
                           productToFirstore is ProductLoadingState)
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
@@ -311,7 +309,7 @@ class _AddProductPageState extends ConsumerState<AddProductPage> {
                 if (titleValidation &&
                     desValidation &&
                     priceValidation &&
-                    twoListX.fileList.isNotEmpty &&
+                    fileList.fileList.isNotEmpty &&
                     colors.isNotEmpty &&
                     genderList.isNotEmpty &&
                     brandsValidation &&
@@ -319,32 +317,28 @@ class _AddProductPageState extends ConsumerState<AddProductPage> {
                     shoesSizes.isNotEmpty) {
                   loadingDialog(context, 'Uploading product...');
 
-                  var twoList =
-                      await ref
-                          .read(pickingProductImgProvider.notifier)
-                          .addProductFileToStorage();
-
-                  await ref
-                      .read(addProductToFirestoreProvider.notifier)
+                  var isInserted = await ref
+                      .read(productDbProvider.notifier)
                       .addProduct(
                         ProductModal(
                           title: titleController.text.trim(),
                           description: desController.text.trim(),
                           price: priceController.text.trim(),
                           colors: colors,
-                          img: twoList!.imgLinkList,
                           genders: genderList.toList(),
-                          storageImgsPath: twoList.storageImgPaths,
                           brand: dropDownValue,
                           shoesSizes: shoesSizes,
                         ),
-                        context,
-                      )
-                      .then((value) {
-                        ref.invalidate(shoesSizesProvider);
-                        ref.invalidate(checkedBtnProvider1);
-                        Navigator.pop(context);
-                      });
+                        fileList.fileList,
+                      );
+                      Navigator.pop(context);
+                  if (isInserted) {
+                    
+                    SnackBarHelper.show('Product added successfuly');
+                    ref.invalidate(shoesSizesProvider);
+                    ref.invalidate(checkedBtnProvider1);
+                    GoRouter.of(context).goNamed(AdminMain.pageName);
+                  }
                 } else {
                   SnackBarHelper.show('Null fields found', color: Colors.red);
                 }

@@ -1,14 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:sneak_peak/controllers/users%20controller/cancellation%20order%20riverpod/cancellation_order_riverpod.dart';
+import 'package:sneak_peak/pages/user%20screens/cancellation%20page/this%20controller/remove_cancelled_order_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/cancellation%20page/this%20controller/cancellation_stream_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/cancellation%20page/widgets/cancellation_card_widget.dart';
 import 'package:sneak_peak/pages/user%20screens/cancellation%20page/widgets/no_cancellations_widget.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/custom%20sliver%20app%20bar/custom_sliverappbar.dart';
 
 class CancellationPage extends ConsumerStatefulWidget {
@@ -29,6 +30,11 @@ class _CancellationPageState extends ConsumerState<CancellationPage> {
   @override
   Widget build(BuildContext contextx) {
     print('cancelled pagebuild called');
+    ref.listen(removerCancelOrderProvider, (previous, next) {
+      if (next!='done' && next!='init') {
+        SnackBarHelper.show(next, color: Colors.red);
+      }
+    },);
     return Scaffold(
       body: Center(
         child: CustomScrollView(
@@ -43,9 +49,9 @@ class _CancellationPageState extends ConsumerState<CancellationPage> {
               child: Center(
                 child: Consumer(
                   builder: (context, x, child) {
-                    var auth = FirebaseAuth.instance.currentUser;
+                    
                     var cancellations = x.watch(
-                      cancellationStreamProvider(auth!.uid),
+                      cancellationStreamProvider,
                     );
                     return cancellations.when(
                       data:
@@ -61,13 +67,13 @@ class _CancellationPageState extends ConsumerState<CancellationPage> {
                                   motion: ScrollMotion(),
                                   children: [
                                     SlidableAction(
-                                      onPressed: (context) {
-                                        ref
-                                            .read(cancellationProvider.notifier)
-                                            .removeCancelledOrders(
-                                              contextx,
-                                              data[index],
-                                            );
+                                      onPressed: (context)async{
+                                        loadingDialog(context, 'Deleting cancelled item...', );
+                                        var isCanecelled= await ref.read(removerCancelOrderProvider.notifier).removeCancelledOrders(data[index],);
+                                        Navigator.pop(contextx);
+                                        if (isCanecelled) {
+                                          SnackBarHelper.show('Deleted successfully');
+                                        }
                                       },
                                       backgroundColor: Colors.red,
                                       foregroundColor: Colors.white,

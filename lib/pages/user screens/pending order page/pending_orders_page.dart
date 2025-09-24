@@ -1,17 +1,17 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:sneak_peak/controllers/users%20controller/pending%20orders%20riverpod/pending_orders_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/pending_orders_riverpod.dart';
 import 'package:sneak_peak/models/cart_poduct_modal.dart';
 import 'package:sneak_peak/models/products_modals.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/this%20controllers/check_and_selected_data_list_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/payment%20method%20page/payment_meth_page.dart';
 import 'package:sneak_peak/pages/user%20screens/pending%20order%20page/this_controllers/pending_stream_provider.dart';
 import 'package:sneak_peak/pages/user%20screens/pending%20order%20page/widgets/no_pending_widget.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/dialog%20boxes/remove_dialog_.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/animated%20loading/animated_loading_widget.dart';
 import 'package:sneak_peak/widgets/custom%20card%20widget/custom_card_widget.dart';
 import 'package:sneak_peak/widgets/custom%20sliver%20app%20bar/custom_sliverappbar.dart';
@@ -38,6 +38,11 @@ class _PendingOrdersState extends ConsumerState<PendingOrders> {
   @override
   Widget build(BuildContext contextX) {
     print('PENDING ORDERS BUILD CALLED');
+     ref.listen(pendingOrdersProvider, (previous, next) {
+      if (next!='init'&&next!='loading'&&next!='done') {
+        SnackBarHelper.show(next, color: Colors.red);
+      }
+    },);
     return Scaffold(
       body: Center(
         child: CustomScrollView(
@@ -55,8 +60,8 @@ class _PendingOrdersState extends ConsumerState<PendingOrders> {
                 child: Center(
                   child: Consumer(
                     builder: (context, x, child) {
-                      var auth = FirebaseAuth.instance.currentUser;
-                      var peningList = x.watch(pendingStreamProvider(auth!.uid));
+                      
+                      var peningList = x.watch(pendingStreamProvider);
 
                     return peningList.when(
                       data: (data) => _dataWidget(contextX, data, x),
@@ -120,10 +125,13 @@ class _PendingOrdersState extends ConsumerState<PendingOrders> {
             deleteDialog(
               context,
               onDel: () async {
-                await ref
-                    .read(pendingOrdersProvider.notifier)
-                    .deletePendingOrder(cartModal, contextX);
-              
+                Navigator.pop(contextX);
+                loadingDialog(contextX, 'Cancelling your order...');
+            var isDeleted= await ref.read(pendingOrdersProvider.notifier).deletePendingOrder(cartModal,);
+              Navigator.pop(contextX);
+              if (isDeleted) {
+                  SnackBarHelper.show('Order cancel successfuly');
+              }
               },
               title: 'Cancel Order?',
               descripton: 'Wanna cancel your order',

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/picking%20product%20imgs%20riverpod%20(img%20picker)/pickng_product_imgs.dart';
+import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/controllers/add_product_picking_imgs_controller.dart';
 import 'package:sneak_peak/utils/constants_colors.dart';
 
 class ProductImgsWidget extends StatelessWidget {

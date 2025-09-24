@@ -2,7 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/users%20controller/user_firebase_riverpod.dart';
+import 'package:sneak_peak/controllers/auth%20riverpod/auth_riverpod.dart';
+import 'package:sneak_peak/controllers/get%20shared%20pref%20data%20riverpod/get_sp_data_riverpod.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/admin%20app%20bar/transparent_app_bar.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
 import 'package:sneak_peak/widgets/custom%20text%20fields/custom_textfields.dart';
@@ -29,6 +32,15 @@ class _EditNamePageState extends ConsumerState<AdminEditNamePage> {
 
   @override
   Widget build(BuildContext context) {
+    print('edit name pag build called');
+     ref.listen(authProvider('update_name_admin'), (previous, next) {
+      if (next is AuthErrorState) {
+        var error= next.error;
+        SnackBarHelper.show(error, color: Colors.red);
+      }else if(next is AuthLoadedSuccessfulyState){
+        SnackBarHelper.show('Name update successfuly');
+      }
+    },);
     return Scaffold(
       appBar: transparentAppBar(
         context: context,
@@ -73,10 +85,13 @@ class _EditNamePageState extends ConsumerState<AdminEditNamePage> {
               padding: EdgeInsets.symmetric(vertical: 20),
               child: CustomButton(
                 btnTitle: 'Update name',
-                onTap: () {
-                  ref
-                      .read(userProvider.notifier)
-                      .updateName(controller.text.trim(), context);
+                onTap: ()async{
+                  loadingDialog(context, 'Updating username...');
+                          await ref.read(authProvider('update_name_admin').notifier).updateUsername(controller.text.trim(),);
+
+                          await ref.read(getSharedPrefDataProvider.notifier).getNameEmailDataFromSP();
+                          Navigator.pop(context);
+                          controller.clear();
                 },
               ),
             ),

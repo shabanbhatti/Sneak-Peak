@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,8 +12,7 @@ class NoPendingWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 
     print('NO PENDING WIDGET BUILD CALLED');
-    var auth = FirebaseAuth.instance.currentUser;
-    var stream = ref.watch(pendingStreamProvider(auth!.uid));
+    var stream = ref.watch(pendingStreamProvider);
     var list= stream.value??[];
       if (list.isEmpty&&!stream.isLoading) {
         return SliverFillRemaining(

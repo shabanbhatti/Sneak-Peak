@@ -5,6 +5,8 @@ import 'package:sneak_peak/controllers/get%20shared%20pref%20data%20riverpod/get
 import 'package:sneak_peak/controllers/user%20img%20riverpod/user_img_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/profile%20page/widgets/profile_circle_avatar_widget.dart';
 import 'package:sneak_peak/utils/constant_imgs.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 
 class TopProfileBar extends StatelessWidget {
   const TopProfileBar({super.key});
@@ -26,7 +28,7 @@ class TopProfileBar extends StatelessWidget {
                   flex: 3,
                   child: Consumer(
                     builder: (context, x, child) {
-                      var userimg = x.watch(userImgProvider);
+                      var userimg = x.watch(userImgProvider('user_img'));
                       if (userimg is LoadingUserImg) {
                         return ProfileCircleAvatarWidget(
                           imgUrl: loadingGifUrl,
@@ -36,10 +38,13 @@ class TopProfileBar extends StatelessWidget {
                       } else if (userimg is LoadedSuccessfulyUserImg) {
                         return ProfileCircleAvatarWidget(
                           imgUrl: userimg.imgUrl,
-                          onTap: () {
-                            x
-                                .read(userImgProvider.notifier)
-                                .takeImage(ImageSource.gallery, context);
+                          onTap: ()async{
+                            loadingDialog(context, 'Uploading image...');
+                          var isDone= await x.read(userImgProvider('user_img').notifier).takeImage(ImageSource.gallery, );
+                           Navigator.pop(context);
+                            if (isDone=='done') {
+                    SnackBarHelper.show('Image uploaded successfully');
+                  }
                           },
                         );
                       } else {

@@ -1,16 +1,17 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:sneak_peak/controllers/users%20controller/cart%20riverpod/cart_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/cart_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/product_quantity_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/this%20controllers/cart_stream_provider.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/this%20controllers/check_and_selected_data_list_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/widgets/cart_card_widget.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/widgets/no_cart_added_widget.dart';
 import 'package:sneak_peak/pages/user%20screens/check%20out%20page/check_out_page.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/price_format.dart';
 import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
@@ -33,6 +34,18 @@ class _CartPageState extends ConsumerState<CartPage> {
   @override
   Widget build(BuildContext contextX) {
     print('cart page build called');
+    ref.listen(cartProvider, (previous, next) {
+      if (next!='loading'&& next!='done'&&next!='init') {
+        SnackBarHelper.show(next, color: Colors.red);
+      }
+    },);
+    ref.listen(productQuantityProvider, (previous, next) {
+      
+        if (next!='loading'&& next!='done'&&next!='init') {
+        SnackBarHelper.show(next, color: Colors.red);
+      
+      }
+    },);
     return Scaffold(
       bottomNavigationBar: _bottomBar(),
       body: Center(
@@ -45,8 +58,7 @@ class _CartPageState extends ConsumerState<CartPage> {
               child: Center(
                 child: Consumer(
                   builder: (context, x, child) {
-                    var auth = FirebaseAuth.instance.currentUser;
-                    var streamList = x.watch(cartStreamProvider(auth!.uid));
+                    var streamList = x.watch(cartStreamProvider);
                     return streamList.when(
                       data:
                           (data) => ListView.builder(
@@ -63,13 +75,11 @@ class _CartPageState extends ConsumerState<CartPage> {
                                     motion: const ScrollMotion(),
                                     children: [
                                       SlidableAction(
-                                        onPressed: (context) {
-                                          ref
-                                              .read(cartProvider.notifier)
-                                              .deleteCart(
-                                                contextX,
-                                                data[index].id ?? '',
-                                              );
+                                        onPressed: (context) async{
+                                          loadingDialog(context, 'Deleting...');
+                                         await ref.read(cartProvider.notifier).deleteCart(data[index].id ?? '',);
+                                         Navigator.pop(contextX);
+                                         
                                         },
                                         backgroundColor: Colors.red,
                                         foregroundColor: Colors.white,
@@ -119,17 +129,22 @@ class _CartPageState extends ConsumerState<CartPage> {
             children: [
               Consumer(
                 builder: (context, x, _) {
-                  var auth = FirebaseAuth.instance.currentUser;
+                  
                   var streamList =
-                      x.watch(cartStreamProvider(auth!.uid)).value ?? [];
+                      x.watch(cartStreamProvider).value ?? [];
                   var selectedList = x.watch(selectedDataList);
                   return (streamList.isNotEmpty &&
                           selectedList.cartList.isNotEmpty)
                       ? IconButton(
-                        onPressed: () {
-                          x
-                              .read(selectedDataList.notifier)
-                              .deleteCartProducts(context);
+                        onPressed: ()async{
+                          loadingDialog(context, 'Deleting...');
+                      var isDeleted= await x.read(selectedDataList.notifier).deleteCartProducts();
+                          Navigator.pop(context);
+                          if (isDeleted) {
+                            SnackBarHelper.show('Delete successfully');
+                          }else{
+                            SnackBarHelper.show('Something went wrong.');
+                          }
                         },
                         icon: const Icon(CupertinoIcons.delete),
                       )

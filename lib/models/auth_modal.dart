@@ -5,11 +5,14 @@ class AuthModal {
 
   final String createdAtDate;
 
+
+
   final String? id;
 
   const AuthModal({
     required this.name,
     required this.email,
+    
     required this.createdAtDate,
     this.id,
   });

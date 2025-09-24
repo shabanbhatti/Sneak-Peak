@@ -3,10 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/users%20controller/wishlist%20riverpod/wishlist_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/wishlist_riverpod.dart';
 import 'package:sneak_peak/models/products_modals.dart';
 import 'package:sneak_peak/pages/user%20screens/view%20product%20image%20page/view_product_img_page.dart';
 import 'package:sneak_peak/utils/constants_colors.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 
 class SliverAppbarForViewProductPage extends ConsumerWidget {
   const SliverAppbarForViewProductPage({super.key, required this.productModal});
@@ -154,14 +156,20 @@ class SliverAppbarForViewProductPage extends ConsumerWidget {
                       var isWishlist = x.watch(wishlistProvider(productModal.id??''));
                       return (isWishlist == false)
                           ? IconButton(
-                            onPressed: () {
-                              x
-                                  .read(
-                                    wishlistProvider(
-                                      productModal.id.toString(),
-                                    ).notifier,
-                                  )
-                                  .addToWishlist(productModal,  context);
+                            onPressed: ()async {
+                              loadingDialog(context, 'Processing wishlist...');
+                                var isDone= await ref.read(wishlistProvider(productModal.id.toString(),).notifier,).addToWishlist(productModal);
+                                Navigator.pop(context);
+                                if (isDone==false) {
+                                  SnackBarHelper.show('Something went wrong', color: Colors.red);
+                                }
+                              // x
+                              //     .read(
+                              //       wishlistProvider(
+                              //         productModal.id.toString(),
+                              //       ).notifier,
+                              //     )
+                              //     .addToWishlist(productModal,  context);
                             },
                             icon: Icon(
                               (isFav)
@@ -174,21 +182,16 @@ class SliverAppbarForViewProductPage extends ConsumerWidget {
                           // ---------------------------------
                           IconButton(
                             onPressed: ()async {
-                              // var p = CartProductModal(
-                              //   brand: productModal.brand,
-                              //   colors: productModal.colors,
-                              //   description: productModal.description,
-                              //   genders: productModal.genders,
-                              //   id: productModal.id,
-                              //   img: productModal.img,
-                              //   price: productModal.price,
-                              //   shoesSizes: productModal.shoesSizes,
-                              //   storageImgsPath: productModal.storageImgsPath,
-                              //   title: productModal.title,
-                              // );
+                            
                               await x.read(wishlistProvider(productModal.id??'').notifier).isFav(false);
                               await x.read(wishlistProvider(productModal.id??'').notifier).setToFalse();
-                             x.read(wishlistProvider(productModal.id??'').notifier).addToWishlist(productModal,  context);
+                              loadingDialog(context, 'Processing wishlist...');
+                                var isDone= await ref.read(wishlistProvider(productModal.id??'').notifier).addToWishlist(productModal);
+                                Navigator.pop(context);
+                                if (isDone==false) {
+                                  SnackBarHelper.show('Something went wrong', color: Colors.red);
+                                }
+                            //  x.read(wishlistProvider(productModal.id??'').notifier).addToWishlist(productModal,  context);
                             },
                             icon: Icon(
                               (isWishlist)

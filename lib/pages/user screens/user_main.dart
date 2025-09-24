@@ -1,8 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sneak_peak/controllers/auth%20riverpod/auth_riverpod.dart';
 import 'package:sneak_peak/controllers/get%20shared%20pref%20data%20riverpod/get_sp_data_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/cart_page.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/this%20controllers/cart_stream_provider.dart';
@@ -105,8 +103,7 @@ class ShoppingCartIcon extends ConsumerWidget {
     return Badge(
       label: Consumer(
         builder: (context, ref, child) {
-           var auth= FirebaseAuth.instance.currentUser?.uid;
-              var streamList = ref.watch(cartStreamProvider(auth??''));
+              var streamList = ref.watch(cartStreamProvider);
 
           return streamList.when(
             data: (list) => Text(list.length.toString()),

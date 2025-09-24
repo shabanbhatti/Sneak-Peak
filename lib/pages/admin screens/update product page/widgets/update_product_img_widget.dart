@@ -1,12 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/updated%20product%20imgs%20riverpod%20(img%20picker)/updated_product_imgs_riverpod.dart';
 import 'package:sneak_peak/models/products_modals.dart';
+import 'package:sneak_peak/pages/admin%20screens/update%20product%20page/controllers/update_product_img_controller.dart';
+import 'package:sneak_peak/pages/admin%20screens/update%20product%20page/controllers/update_stream_controller.dart';
 import 'package:sneak_peak/utils/constants_colors.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 
 class UpdateProductImgWidget extends StatelessWidget {
   const UpdateProductImgWidget({
@@ -40,93 +41,96 @@ class UpdateProductImgWidget extends StatelessWidget {
                   builder: (context, imgPickerRef, child) {
                     // var twoList = imgPickerRef.watch(updateProductImgProvider);
                     var dbStreamImgList = imgPickerRef.watch(
-                      dbImagesStreamProvider(productModal.id.toString()),
+                      productModelStreamProviderForUpdateAdminPage(
+                        productModal.id.toString(),
+                      ),
                     );
-                    var streamList =
+                    var productModel =
                         imgPickerRef
                             .watch(
-                              dbImagesStreamProvider(
+                              productModelStreamProviderForUpdateAdminPage(
                                 productModal.id.toString(),
                               ),
                             )
                             .value;
                     return dbStreamImgList.when(
-                      data:
-                          (data) =>
-                              (streamList!.isEmpty)
-                                  ? const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        CupertinoIcons.photo,
-                                        color: Colors.orange,
-                                      ),
-                                      Text(
-                                        '   No image selected.',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                  : PageView.builder(
-                                    physics: const BouncingScrollPhysics(),
-                                    controller: pageController,
-                                    itemCount: data.length,
-                                    itemBuilder: (context, index) {
-                                      return Container(
-                                        height: double.infinity,
-                                        width: double.infinity,
-                                        color: Colors.transparent,
-                                        child: Stack(
-                                          children: [
-                                            CachedNetworkImage(
-                                              imageUrl: data[index],
-                                              height: double.infinity,
-                                              width: double.infinity,
-                                              fit: BoxFit.contain,
-                                              progressIndicatorBuilder:
-                                                  (
-                                                    context,
-                                                    url,
-                                                    progress,
-                                                  ) => Skeletonizer(
-                                                    enabled: true,
-                                                    child: Container(
-                                                      height: double.infinity,
-                                                      width: double.infinity,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                            ),
-                                            Align(
-                                              alignment: Alignment.topRight,
-                                              child: IconButton(
-                                                onPressed: () {
-                                                  imgPickerRef
-                                                      .read(
-                                                        updateProductImgProvider
-                                                            .notifier,
-                                                      )
-                                                      .deleteImage(
-                                                        index,
-                                                        productModal.id
-                                                            .toString(),
-                                                            contextX
-                                                      );
-                                                },
-                                                icon: const Icon(
-                                                  Icons.remove_circle,
-                                                  size: 30,
-                                                  color: Colors.red,
+                      data: (data) {
+                        var imgList = productModel?.img ?? [];
+                        var imgPaths = productModel?.storageImgsPath ?? [];
+                        if (imgList.isEmpty) {
+                          return const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(CupertinoIcons.photo, color: Colors.orange),
+                              Text(
+                                '   No image selected.',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          );
+                        } else {
+                          return PageView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            controller: pageController,
+                            itemCount: imgList.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                height: double.infinity,
+                                width: double.infinity,
+                                color: Colors.transparent,
+                                child: Stack(
+                                  children: [
+                                    CachedNetworkImage(
+                                      imageUrl: imgList[index],
+                                      height: double.infinity,
+                                      width: double.infinity,
+                                      fit: BoxFit.contain,
+                                      progressIndicatorBuilder:
+                                          (context, url, progress) =>
+                                              Skeletonizer(
+                                                enabled: true,
+                                                child: Container(
+                                                  height: double.infinity,
+                                                  width: double.infinity,
+                                                  color: Colors.grey,
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                    ),
+                                    Align(
+                                      alignment: Alignment.topRight,
+                                      child: IconButton(
+                                        onPressed: () async {
+                                          loadingDialog(
+                                            context,
+                                            'Deleting image...',
+                                          );
+                                          await imgPickerRef
+                                              .read(
+                                                updateProductImgProvider
+                                                    .notifier,
+                                              )
+                                              .deleteImage(
+                                                index,
+                                                productModal.id.toString(),
+                                                imgList,
+                                                imgPaths,
+                                              );
+                                          Navigator.pop(contextX);
+                                        },
+                                        icon: const Icon(
+                                          Icons.remove_circle,
+                                          size: 30,
+                                          color: Colors.red,
                                         ),
-                                      );
-                                    },
-                                  ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        }
+                      },
                       error: (error, stackTrace) => Text(error.toString()),
                       loading:
                           () => Skeletonizer(
@@ -148,25 +152,3 @@ class UpdateProductImgWidget extends StatelessWidget {
     );
   }
 }
-
-final dbImagesStreamProvider = StreamProvider.family<List<String>, String>((
-  ref,
-  id,
-) async* {
-  yield* FirebaseFirestore.instance
-      .collection('products')
-      .doc(id)
-      .snapshots()
-      .map((event) {
-        final data = event.data();
-        
-
-        
-        final List<dynamic>? imagesDynamic = data!['images'];
-
-      
-
-        
-        return imagesDynamic!.map((e) => e.toString()).toList();
-      });
-});

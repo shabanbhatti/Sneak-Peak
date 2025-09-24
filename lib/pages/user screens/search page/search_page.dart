@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sneak_peak/controllers/get%20products%20stream%20provider/get_products_stream.dart';
 import 'package:sneak_peak/controllers/search%20product%20riverpod/search_product_riverpod.dart';
-import 'package:sneak_peak/controllers/users%20controller/wishlist%20riverpod/wishlist_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/wishlist_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/search%20page/widgets/no_search_widget.dart';
 import 'package:sneak_peak/pages/user%20screens/view%20product%20page/view_product_page.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/custom%20card%20widget/custom_card_widget.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
@@ -140,14 +142,20 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                         'id':list[index].id
                                       } );
                             },
-                            onRemove: () {
-                              ref
-                                  .read(
-                                    wishlistProvider(
-                                      list[index].id.toString(),
-                                    ).notifier,
-                                  )
-                                  .addToWishlist(list[index], context);
+                            onRemove: ()async {
+                                loadingDialog(context, 'Processing wishlist...');
+                                var isDone= await ref.read(wishlistProvider(list[index].id.toString(),).notifier,).addToWishlist(list[index]);
+                                Navigator.pop(context);
+                                if (isDone==false) {
+                                  SnackBarHelper.show('Something went wrong', color: Colors.red);
+                                }
+                              // ref
+                              //     .read(
+                              //       wishlistProvider(
+                              //         list[index].id.toString(),
+                              //       ).notifier,
+                              //     )
+                              //     .addToWishlist(list[index], context);
                             },
                             icon:
                                 (ref.watch(

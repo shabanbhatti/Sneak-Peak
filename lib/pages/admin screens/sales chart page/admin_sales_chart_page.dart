@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/fl%20chart%20riverpod/fl_chart_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/fl_chart_riverpod.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/admin%20app%20bar/admin_app_bar.dart';
 
 class AdminSalesChart extends ConsumerStatefulWidget {
@@ -19,20 +23,33 @@ class _AdminSalesChartState extends ConsumerState<AdminSalesChart> {
     if (mounted) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         ref.read(flChartProvider.notifier).initialize();
-        ref.read(flChartProvider.notifier).getData(context);
+      loadFlChart();
       });
     }
   }
 
+  void loadFlChart()async{
+  loadingDialog(context, '', color: Colors.transparent);
+        await ref.read(flChartProvider.notifier).getData();
+        Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('fl chart page build called');
+    ref.listen(flChartProvider, (previous, next) {
+      if (next.isError) {
+        var error= next.error;
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    },);
     return Scaffold(
       appBar: adminAppBar('Sales Statistics'),
       body: Center(
         child: Consumer(
           builder: (context, x, child) {
             var flChartProvi = x.watch(flChartProvider);
-
+log('$flChartProvi');
             if (flChartProvi.isLoading) {
               return const SizedBox();
             } else if (flChartProvi.isError) {

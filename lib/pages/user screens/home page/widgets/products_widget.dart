@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/users%20controller/search%20product%20in%20home%20riverpod/search_product_in_home_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/search_product_in_home_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/home%20page/widgets/product_card_data_widget.dart';
 import 'package:sneak_peak/pages/user%20screens/see%20all%20page/see_all_page.dart';
 

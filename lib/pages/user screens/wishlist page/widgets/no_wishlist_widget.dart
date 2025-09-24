@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,8 +10,8 @@ class NoWishlistWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var auth = FirebaseAuth.instance.currentUser;
-    var stream = ref.watch(wishlistStreamProvider(auth!.uid));
+    
+    var stream = ref.watch(wishlistStreamProvider);
     var list = stream.value ?? [];
     if (list.isEmpty && !stream.isLoading) {
       return SliverFillRemaining(

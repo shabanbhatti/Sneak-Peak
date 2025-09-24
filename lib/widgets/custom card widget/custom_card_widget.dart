@@ -51,7 +51,7 @@ class CustomCardWidget extends StatelessWidget {
                     (productModal.isProductExist!)
                         ? CachedNetworkImage(
                           imageUrl:
-                              (productModal.img == null)
+                              (productModal.img == null|| productModal.img!.isEmpty)
                                   ? noImgUrl
                                   : productModal.img![0],
                           fit: BoxFit.cover,

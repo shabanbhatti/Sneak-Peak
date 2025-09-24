@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,9 +11,9 @@ class CompletedNoDataWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var auth = FirebaseAuth.instance.currentUser;
-    var stream = ref.watch(toShipStreamProvider(auth!.uid));
-    var streamList = ref.watch(toShipStreamProvider(auth.uid)).value ?? [];
+    
+    var stream = ref.watch(toShipStreamProvider);
+    var streamList = ref.watch(toShipStreamProvider).value ?? [];
     var list =
         streamList
             .where((element) => element.deliveryStatus == delivered)

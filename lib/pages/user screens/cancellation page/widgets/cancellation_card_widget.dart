@@ -2,11 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:sneak_peak/controllers/users%20controller/cancellation%20order%20riverpod/cancellation_order_riverpod.dart';
+import 'package:sneak_peak/pages/user%20screens/cancellation%20page/this%20controller/remove_cancelled_order_riverpod.dart';
 import 'package:sneak_peak/models/cart_poduct_modal.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/widgets/quantity_widget.dart';
 import 'package:sneak_peak/utils/constants_colors.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/price_format.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 
 class CancellationCardWidget extends ConsumerWidget {
   const CancellationCardWidget({super.key, required this.cartModal, required this.myContext});
@@ -75,10 +77,13 @@ class CancellationCardWidget extends ConsumerWidget {
             Align(
               alignment: Alignment.topLeft,
               child: IconButton(
-                onPressed: () {
-                  ref
-                      .read(cancellationProvider.notifier)
-                      .removeCancelledOrders(myContext, cartModal);
+                onPressed: ()async{
+                  loadingDialog(contextx, 'Deleting cancelled item...', );
+              var isCanecelled= await ref.read(removerCancelOrderProvider.notifier).removeCancelledOrders(cartModal);
+                Navigator.pop(contextx);
+                   if (isCanecelled) {
+                 SnackBarHelper.show('Deleted successfully');
+                      }
                 },
                 icon: const Icon(Icons.remove_circle, color: Colors.red),
               ),

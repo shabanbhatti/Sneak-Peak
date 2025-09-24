@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:sneak_peak/controllers/users%20controller/cart%20riverpod/cart_riverpod.dart';
+import 'package:sneak_peak/controllers/users%20controller/cart_riverpod.dart';
 import 'package:sneak_peak/models/cart_poduct_modal.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/this%20controllers/check_and_selected_data_list_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/widgets/quantity_widget.dart';

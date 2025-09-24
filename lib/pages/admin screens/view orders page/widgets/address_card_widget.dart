@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:sneak_peak/controllers/users%20controller/address%20riverpod/address_riverpd.dart';
+import 'package:sneak_peak/controllers/users%20controller/address_riverpd.dart';
 import 'package:sneak_peak/models/orders_modals.dart';
 import 'package:sneak_peak/utils/constants_colors.dart';
 
@@ -36,7 +36,7 @@ final OrdersModals ordersModals;
                           var myAddress = address.addressModal;
                           return Column(
                             children: [
-                              _rowAddressWidget('Name', myAddress!.name ?? ''),
+                              _rowAddressWidget('Name', myAddress?.name ?? ''),
 
                               _rowAddressWidget(
                                 'Uid',
@@ -45,29 +45,29 @@ final OrdersModals ordersModals;
 
                               _rowAddressWidget(
                                 'Address',
-                                myAddress.address ?? '',
+                                myAddress?.address ?? '',
                               ),
 
                               _rowAddressWidget(
                                 'Phone',
-                                myAddress.phoneNumber ?? '',
+                                myAddress?.phoneNumber ?? '',
                               ),
 
-                              _rowAddressWidget('City', myAddress.city ?? ''),
+                              _rowAddressWidget('City', myAddress?.city ?? ''),
 
                               _rowAddressWidget(
                                 'Region',
-                                myAddress.region ?? '',
+                                myAddress?.region ?? '',
                               ),
 
                               _rowAddressWidget(
                                 'Cetagory',
-                                myAddress.addressCetaory ?? '',
+                                myAddress?.addressCetaory ?? '',
                               ),
                             ],
                           );
                         } else {
-                          return SizedBox();
+                          return const SizedBox();
                         }
                       },
                     ),

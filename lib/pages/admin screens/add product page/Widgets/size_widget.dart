@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sneak_peak/controllers/admin%20controllers/shoes%20sizes%20riverpod/shoes_sizes_riverpod.dart';
+import 'package:sneak_peak/controllers/admin%20controllers/shoes_sizes_riverpod.dart';
 import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/Widgets/circle_size_widget.dart';
-import 'package:sneak_peak/widgets/gender%20cetagory%20collection%20btn/gender_cetagory_cllection_btn.dart';
 
 class ShoesSizes extends StatelessWidget {
   const ShoesSizes({super.key, required this.shoesSized, required this.title});

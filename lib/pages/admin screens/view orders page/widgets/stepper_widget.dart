@@ -1,13 +1,15 @@
 import 'package:another_stepper/dto/stepper_data.dart';
 import 'package:another_stepper/widgets/another_stepper.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sneak_peak/models/orders_modals.dart';
 import 'package:sneak_peak/pages/admin%20screens/orders%20page/controllers/orders_stream_riverpod.dart';
+import 'package:sneak_peak/pages/admin%20screens/view%20orders%20page/controllers/strepper_stream_riverpod.dart';
 import 'package:sneak_peak/pages/admin%20screens/view%20orders%20page/controllers/update_steps_riverpod.dart';
 import 'package:sneak_peak/utils/constant_steps.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 
 class AdminStepperWidget extends ConsumerStatefulWidget {
   const AdminStepperWidget({super.key, required this.ordersModals});
@@ -21,6 +23,11 @@ class _AdminStepperWidgetState extends ConsumerState<AdminStepperWidget> {
   @override
   Widget build(BuildContext context) {
     print('stepper widget build calld');
+    ref.listen(updateStepsProvider, (previous, next) {
+      if (next!='done') {
+        SnackBarHelper.show(next, color: Colors.red);
+      }
+    },);
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 10),
       sliver: SliverToBoxAdapter(
@@ -112,16 +119,11 @@ class _AdminStepperWidgetState extends ConsumerState<AdminStepperWidget> {
           textStyle: TextStyle(color: textColor, fontSize: 10),
         ),
         iconWidget: GestureDetector(
-          onTap: () {
-            ref
-                .read(updateStepsProvider.notifier)
-                .updateStep(
-                  widget.ordersModals.id ?? '',
-                  title,
-                  widget.ordersModals.userUid ?? '',
-                  context,
-                );
+          onTap: ()async {
+            loadingDialog(context, '', color: Colors.transparent);
+            await ref.read(updateStepsProvider.notifier).updateStep(widget.ordersModals ,title,widget.ordersModals.userUid ?? '');
             ref.invalidate(adminOrdersStreamProvider);
+            Navigator.pop(context);
           },
           child: Icon(Icons.check_circle, color: color),
         ),
@@ -130,11 +132,3 @@ class _AdminStepperWidgetState extends ConsumerState<AdminStepperWidget> {
   }
 }
 
-final stepsStreamProvider = StreamProvider.family<String, String>((ref, id) {
-  var db = FirebaseFirestore.instance.collection('orders').doc(id);
-
-  return db.snapshots().map((event) {
-    var data = event.data() ?? {};
-    return data['deliveryStatus'];
-  });
-});

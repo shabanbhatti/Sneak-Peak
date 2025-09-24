@@ -3,22 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sneak_peak/controllers/auth%20riverpod/auth_riverpod.dart';
+import 'package:sneak_peak/pages/admin%20screens/admin_main.dart';
 import 'package:sneak_peak/pages/auth%20pages/forgot%20pass%20page/forgot_pass_page.dart';
+import 'package:sneak_peak/pages/auth%20pages/login%20page/widgets/login_google_signin_widget.dart';
 import 'package:sneak_peak/pages/auth%20pages/signup%20page/signup_page.dart';
+import 'package:sneak_peak/pages/user%20screens/user_main.dart';
 import 'package:sneak_peak/utils/constants_colors.dart';
+import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/utils/validations.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
 import 'package:sneak_peak/widgets/custom%20text%20fields/custom_textfields.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
   static const pageName = 'login_page';
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage>
+class _LoginPageState extends ConsumerState<LoginPage>
     with SingleTickerProviderStateMixin {
   late AnimationController animationController;
   late Animation<Offset> slide;
@@ -38,7 +43,7 @@ class _LoginPageState extends State<LoginPage>
       duration: const Duration(milliseconds: 500),
     );
 
-    slide = Tween<Offset>(begin: Offset(0.0, -0.5), end: Offset.zero).animate(
+    slide = Tween<Offset>(begin:const Offset(0.0, -0.5), end: Offset.zero).animate(
       CurvedAnimation(parent: animationController, curve: Curves.easeInOutBack),
     );
     animationController.forward();
@@ -57,6 +62,19 @@ class _LoginPageState extends State<LoginPage>
   @override
   Widget build(BuildContext context) {
     print('Login BUILD CALLED');
+    ref.listen(authProvider('login'), (previous, next) {
+      if (next is AuthErrorState) {
+        var error = next.error;
+        
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    },);
+    ref.listen(authProvider('google'), (previous, next) {
+      if (next is AuthErrorState) {
+        var error = next.error;
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    },);
     return Scaffold(
       appBar: AppBar(toolbarHeight: 10),
       body: SafeArea(
@@ -77,17 +95,18 @@ class _LoginPageState extends State<LoginPage>
                   const SizedBox(height: 10),
                   Consumer(
                     builder: (context, authRef, child) {
-                      var auth= authRef.watch(authProvider);
+                      var loginAuth= authRef.watch(authProvider('login'));
+                      var googleAuth= authRef.watch(authProvider('google'));
                       return CustomButton(
-                    btnTitleWidget: (auth is AuthLoadingState)?CupertinoActivityIndicator(color: Colors.white,):Text(
+                    btnTitleWidget: (loginAuth is AuthLoadingState|| googleAuth is AuthLoadingState)?const CupertinoActivityIndicator(color: Colors.white,):const Text(
                       'Login',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     onTap: () {
-                      onLogin(authRef);
+                      _onLogin(authRef);
                     },
                   );
                     },
@@ -99,7 +118,7 @@ class _LoginPageState extends State<LoginPage>
                   ),
                   const SizedBox(height: 20),
 
-                  _signUpGoogle(),
+                  const LoginGoogleSigninWidget(),
                   const SizedBox(height: 10),
                   _signUpByPage(context),
                 ],
@@ -111,26 +130,31 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-void onLogin(WidgetRef authRef){
+void _onLogin(WidgetRef authRef)async{
 
 var emailValidation= emailKey.currentState!.validate();
 var passwordValidation= passKey.currentState!.validate();
 
 if (emailValidation&&passwordValidation) {
-  authRef.read(authProvider.notifier).loginAccount(emailController.text.trim(), passController.text.trim(), context);
+loadingDialog(context, 'Signing you in...');
+  var isLogin= await authRef.read(authProvider('login').notifier).loginAccount(emailController.text.trim(), passController.text.trim(),);
+  if (mounted) {
+    Navigator.pop(context);
+  if (isLogin=='admin') {
+     GoRouter.of(context).goNamed(AdminMain.pageName);
+  }else if(isLogin=='user'){
+GoRouter.of(context).goNamed(UserMainPage.pageName);
+  }
+  }
+  
 }
-
-
 }
-
-
-
 }
 
 Widget _topTitle() {
   return Padding(
     padding: EdgeInsets.all(17),
-    child: Row(
+    child:const Row(
       children: [
         Text(
           'Login\naccount!',
@@ -202,26 +226,7 @@ Widget _forgotPasswordButton(BuildContext context) {
   );
 }
 
-Widget _signUpGoogle() {
-  return Consumer(
-    builder: (context, authRef,child) {
-      return InkWell(
-        onTap: () async{
-        await authRef.read(authProvider.notifier).signInGoogle(context);
 
-        },
-        child: Container(
-          height: 50,
-          width: 50,
-          decoration: const ShapeDecoration(
-            shape: CircleBorder(side: BorderSide(color: Colors.orange, width: 2)),
-            image: DecorationImage(image: AssetImage('assets/images/go_ogle.png')),
-          ),
-        ),
-      );
-    }
-  );
-}
 
 Widget _signUpByPage(BuildContext context) {
   return Row(

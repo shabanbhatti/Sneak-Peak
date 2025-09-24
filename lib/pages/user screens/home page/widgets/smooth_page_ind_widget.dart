@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:sneak_peak/pages/admin%20screens/home%20page/widgets/caraousel_widget.dart';
+import 'package:sneak_peak/controllers/banners_stream.dart';
 import 'package:sneak_peak/pages/user%20screens/home%20page/widgets/carousel_user_home_widget.dart';
 
 class SmoothPageIndWidget extends StatelessWidget {
