@@ -73,17 +73,20 @@ class _SignupPageState extends ConsumerState<SignupPage>
     print('Signup PAGE BUILD CALLED');
     ref.listen(authProvider('create'), (previous, next) {
       if (next is AuthErrorState) {
-        var error= next.error;
-        
+        var error = next.error;
+
         SnackBarHelper.show(error, color: Colors.red);
-      }else if(next is AuthLoadedSuccessfulyState){
-        SnackBarHelper.show('Verification link has to your email in the spam folder. Please verify!', duration: const Duration(seconds: 5));
+      } else if (next is AuthLoadedSuccessfulyState) {
+        SnackBarHelper.show(
+          'Verification link has to your email in the spam folder. Please verify!',
+          duration: const Duration(seconds: 30),
+        );
       }
-    },);
+    });
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 50,
-
+backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
           onPressed: () {
             GoRouter.of(context).goNamed(LoginPage.pageName);
@@ -171,6 +174,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
               name: nameController.text.trim(),
               email: emailController.text.trim(),
               createdAtDate: DateTime.now().toString(),
+              fcmToken: ''
             ),
             passController.text.trim(),
           );
@@ -187,7 +191,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
 Widget _topTitle() {
   return Padding(
     padding: EdgeInsets.only(left: 17),
-    child: Row(
+    child:const Row(
       children: [
         Text(
           'Create an\naccount!',

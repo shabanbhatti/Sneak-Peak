@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sneak_peak/controllers/users%20controller/get_product_family_stream_riverpod.dart';
 import 'package:sneak_peak/controllers/users%20controller/search_product_in_home_riverpod.dart';
 import 'package:sneak_peak/controllers/users%20controller/wishlist_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/view%20product%20page/view_product_page.dart';
 import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/snack_bar_helper.dart';
-import 'package:sneak_peak/widgets/custom%20card%20widget/custom_card_widget.dart';
+import 'package:sneak_peak/widgets/custom%20card%20widget/custom_card_widget_for_user_home.dart';
 import 'package:sneak_peak/widgets/custom%20card%20widget/loading_card_widget.dart';
 
 class ProductCardDataWidget extends ConsumerWidget {
@@ -27,13 +28,13 @@ class ProductCardDataWidget extends ConsumerWidget {
       builder: (context, x, child) {
         var productDataStream = x.watch(streamsProductDataProvider(dataTitle));
         var productList = x.watch(userHomeSearchProductProvider(dataTitle));
-        
+
         return productDataStream.when(
           data:
               (data) =>
                   (productList.isNotEmpty)
                       ? Expanded(
-                        flex: 10,
+                        flex: 20,
                         child: ListView.builder(
                           physics: const BouncingScrollPhysics(),
 
@@ -47,9 +48,9 @@ class ProductCardDataWidget extends ConsumerWidget {
                                 horizontal: 5,
                                 vertical: 5,
                               ),
-                              child: SizedBox(
-                                width: 150,
-                                child: CustomCardWidget(
+                              child: Container(
+                                width: 185,
+                                child: CustomCardWidgetForUserHome(
                                   productModal: productList[index],
                                   onTap: () {
                                     GoRouter.of(context).pushNamed(
@@ -67,13 +68,25 @@ class ProductCardDataWidget extends ConsumerWidget {
                                               as Map<String, dynamic>,
                                     );
                                   },
-                                  onRemove: ()async{
-                                   loadingDialog(context, 'Processing wishlist...');
-                                var isDone= await x.read(wishlistProvider(productList[index].id.toString(),).notifier,).addToWishlist(data[index]);
-                                Navigator.pop(context);
-                                if (isDone==false) {
-                                  SnackBarHelper.show('Something went wrong', color: Colors.red);
-                                }
+                                  onRemove: () async {
+                                    loadingDialog(
+                                      context,
+                                      'Processing wishlist...',
+                                    );
+                                    var isDone = await x
+                                        .read(
+                                          wishlistProvider(
+                                            productList[index].id.toString(),
+                                          ).notifier,
+                                        )
+                                        .addToWishlist(data[index]);
+                                    Navigator.pop(context);
+                                    if (isDone == false) {
+                                      SnackBarHelper.show(
+                                        'Something went wrong',
+                                        color: Colors.red,
+                                      );
+                                    }
                                   },
                                   icon:
                                       (x.watch(
@@ -126,7 +139,12 @@ Widget _loading() {
       itemBuilder:
           (context, index) => Padding(
             padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-            child: SizedBox(width: 150, child: const LoadingCardWidget()),
+            child: Skeletonizer(
+              child: const SizedBox(
+                width: 200,
+                child: const LoadingCardWidget(),
+              ),
+            ),
           ),
     ),
   );

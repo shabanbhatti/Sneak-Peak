@@ -8,12 +8,16 @@ class TextFieldAddressWidget extends StatelessWidget {
     required this.inputTitle,
     this.keyboardType,
     required this.title,
+    required this.formKey,
+    required this.validation
   });
 
   final String title;
   final String inputTitle;
   final TextEditingController controller;
   final TextInputType? keyboardType;
+  final GlobalKey<FormState> formKey;
+  final String? Function(String?)? validation;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -41,14 +45,17 @@ class TextFieldAddressWidget extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 60,
-            child: CustomTextfields(
-              controller: controller,
-              title: title,
-              focusNode: FocusNode(),
-              isObscure: false,
-              validator: (p0) => '',
-              keyboardType: keyboardType,
+            height: 80,
+            child: Form(
+              key: formKey,
+              child: CustomTextfields(
+                controller: controller,
+                title: title,
+                focusNode: FocusNode(),
+                isObscure: false,
+                validator: validation,
+                keyboardType: keyboardType,
+              ),
             ),
           ),
         ],

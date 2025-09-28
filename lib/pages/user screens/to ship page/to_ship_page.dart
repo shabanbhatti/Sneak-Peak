@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/cross%20fade%20anim%20riverpod/cross_fade_anim_riverpod.dart';
+import 'package:sneak_peak/controllers/cross_fade_anim_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/to%20ship%20page/controllers/to_ship_stream_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/to%20ship%20page/widgets/to_ship_no_data_wdget.dart';
 import 'package:sneak_peak/pages/user%20screens/view%20orders%20page/view_order_page.dart';
@@ -36,6 +36,10 @@ class _ToShipPageState extends ConsumerState<ToShipPage> {
   Widget build(BuildContext context) {
     print('TO SHIP BUILD CALLED');
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 5,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: Center(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),

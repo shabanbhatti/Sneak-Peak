@@ -6,14 +6,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:sneak_peak/controllers/admin%20controllers/order_delivery_status_riverpod.dart';
-import 'package:sneak_peak/controllers/cross%20fade%20anim%20riverpod/cross_fade_anim_riverpod.dart';
+import 'package:sneak_peak/controllers/cross_fade_anim_riverpod.dart';
 import 'package:sneak_peak/models/cart_poduct_modal.dart';
 import 'package:sneak_peak/pages/admin%20screens/orders%20page/controllers/orders_stream_riverpod.dart';
 import 'package:sneak_peak/pages/admin%20screens/orders%20page/widgets/no_orders_widget.dart';
 import 'package:sneak_peak/pages/admin%20screens/view%20orders%20page/view_orders_page.dart';
 import 'package:sneak_peak/utils/constant_steps.dart';
 import 'package:sneak_peak/utils/constants_colors.dart';
-import 'package:sneak_peak/widgets/admin%20app%20bar/admin_app_bar.dart';
+import 'package:sneak_peak/utils/constants_imgs_paths.dart';
 import 'package:sneak_peak/widgets/animated%20loading/animated_loading_widget.dart';
 
 class AdminOrdersPage extends ConsumerStatefulWidget {
@@ -53,11 +53,24 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
   Widget build(BuildContext context) {
     print('Admin order page build called');
     return Scaffold(
-      appBar: adminAppBar('Orders'),
+      
       body: Center(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
+            SliverAppBar(
+              backgroundColor: Colors.transparent,
+
+              leading: Padding(
+                padding: EdgeInsets.all(8),
+                child: Image.asset(imgLogo),
+              ),
+              centerTitle: true,
+
+              title: const Text('Orders', style: TextStyle()),
+              snap: true,
+              floating: true,
+            ),
             SliverToBoxAdapter(
               child: Consumer(
                 builder: (context, x, child) {
@@ -103,7 +116,6 @@ class _AdminOrdersPageState extends ConsumerState<AdminOrdersPage> {
                                               list[index]
                                                   .productsList![0]
                                                   .img![0],
-                                          
                                         )
                                         : const Text(
                                           'Sold out',

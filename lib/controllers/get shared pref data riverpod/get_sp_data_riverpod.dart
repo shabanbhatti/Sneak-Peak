@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sneak_peak/provider/provider_objects.dart';
 import 'package:sneak_peak/repository/auth%20repository/auth_repository.dart';
@@ -24,6 +26,8 @@ await SPHelper.setString(SPHelper.email, data.email);
 }else{
   state=(name: name, email: email);
 }
+log(email);
+log(name);
 return null;
 } catch (e) {
   return e.toString();

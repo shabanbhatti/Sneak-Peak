@@ -22,16 +22,16 @@ class _AdminSalesChartState extends ConsumerState<AdminSalesChart> {
 
     if (mounted) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        ref.read(flChartProvider.notifier).initialize();
-      loadFlChart();
+        loadFlChart();
       });
     }
   }
 
-  void loadFlChart()async{
-  loadingDialog(context, '', color: Colors.transparent);
-        await ref.read(flChartProvider.notifier).getData();
-        Navigator.pop(context);
+  void loadFlChart() async {
+    loadingDialog(context, 'This may take a few moments...');
+    await ref.read(flChartProvider.notifier).initialize();
+    await ref.read(flChartProvider.notifier).getData();
+    Navigator.pop(context);
   }
 
   @override
@@ -39,17 +39,17 @@ class _AdminSalesChartState extends ConsumerState<AdminSalesChart> {
     print('fl chart page build called');
     ref.listen(flChartProvider, (previous, next) {
       if (next.isError) {
-        var error= next.error;
+        var error = next.error;
         SnackBarHelper.show(error, color: Colors.red);
       }
-    },);
+    });
     return Scaffold(
       appBar: adminAppBar('Sales Statistics'),
       body: Center(
         child: Consumer(
           builder: (context, x, child) {
             var flChartProvi = x.watch(flChartProvider);
-log('$flChartProvi');
+            log('$flChartProvi');
             if (flChartProvi.isLoading) {
               return const SizedBox();
             } else if (flChartProvi.isError) {
@@ -108,32 +108,35 @@ log('$flChartProvi');
                         ),
                       ),
                     ),
-
-                    Container(
-                      height: 200,
-                      width: 200,
-                      color: Colors.transparent,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _colorsWithName(
-                            'NDURE (${((value.ndure / total) * 100).toStringAsFixed(0)}%)',
-                            Colors.orange,
-                          ),
-                          _colorsWithName(
-                            'Bata  (${((value.bata / total) * 100).toStringAsFixed(0)}%)',
-                            Colors.red,
-                          ),
-                          _colorsWithName(
-                            'Servis  (${((value.servis / total) * 100).toStringAsFixed(0)}%)',
-                            Colors.blue,
-                          ),
-                          _colorsWithName(
-                            'Stylo  (${((value.stylo / total) * 100).toStringAsFixed(0)}%)',
-                            Colors.green,
-                          ),
-                        ],
+                    const SizedBox(height: 50),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Container(
+                        height: 200,
+                        width: double.infinity,
+                        color: Colors.transparent,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _colorsWithName(
+                              'NDURE (${((value.ndure / total) * 100).toStringAsFixed(0)}%)',
+                              Colors.orange,
+                            ),
+                            _colorsWithName(
+                              'Bata  (${((value.bata / total) * 100).toStringAsFixed(0)}%)',
+                              Colors.red,
+                            ),
+                            _colorsWithName(
+                              'Servis  (${((value.servis / total) * 100).toStringAsFixed(0)}%)',
+                              Colors.blue,
+                            ),
+                            _colorsWithName(
+                              'Stylo  (${((value.stylo / total) * 100).toStringAsFixed(0)}%)',
+                              Colors.green,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -148,20 +151,22 @@ log('$flChartProvi');
 }
 
 Widget _colorsWithName(String title, Color color) {
-  return Padding(
-    padding: EdgeInsets.symmetric(vertical: 5),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+  return Expanded(
+    child: Padding(
+      padding: EdgeInsets.symmetric(vertical: 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
 
-      children: [
-        Flexible(child: Container(height: 20, width: 20, color: color)),
-        Flexible(
-          child: Text(
-            '  $title',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+        children: [
+          Flexible(child: Container(height: 20, width: 20, color: color)),
+          Flexible(
+            child: Text(
+              '  $title',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }

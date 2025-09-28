@@ -4,12 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:sneak_peak/controllers/admin%20controllers/banners_riverpod.dart';
 import 'package:sneak_peak/controllers/admin%20controllers/product_db_riverpod.dart';
 import 'package:sneak_peak/controllers/banners_stream.dart';
-import 'package:sneak_peak/controllers/get%20products%20stream%20provider/get_products_stream.dart';
+import 'package:sneak_peak/controllers/fcm_token_riverpod.dart';
+import 'package:sneak_peak/controllers/get_products_stream.dart';
 import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/admin_add_product_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/home%20page/widgets/caraousel_widget.dart';
 import 'package:sneak_peak/pages/admin%20screens/home%20page/widgets/product_data_widget.dart';
+import 'package:sneak_peak/pages/admin%20screens/send%20notification%20page/send_notification_page.dart';
 import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
-import 'package:sneak_peak/utils/dialog%20boxes/remove_product_dialog.dart';
 import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/admin%20app%20bar/admin_sliver_app_bar.dart';
 import 'package:sneak_peak/widgets/custom%20btn/custom_button.dart';
@@ -28,7 +29,10 @@ class _AdminHomeState extends ConsumerState<AdminHome> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {});
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(fcmTokenProvider.notifier).updateFcmTokenInInitState();
+       
+    });
   }
 
   @override
@@ -57,7 +61,9 @@ class _AdminHomeState extends ConsumerState<AdminHome> {
         padding: EdgeInsets.all(1),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
           children: [
+          
             FloatingActionButton(
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -75,7 +81,29 @@ class _AdminHomeState extends ConsumerState<AdminHome> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            adminSliverAppBar('Hey Admin', controller, focusNode, context),
+            adminSliverAppBar(
+              'Hey Admin',
+              controller,
+              focusNode,
+              context,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        GoRouter.of(context).pushNamed(SendNotificationPage.pageName);
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: Colors.orange,
+                        child:const Icon(Icons.notification_add, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             SliverPadding(
               padding: EdgeInsets.symmetric(vertical: 20),
               sliver: SliverToBoxAdapter(
@@ -141,42 +169,42 @@ Widget _noProductText() {
   );
 }
 
-Widget _deleteAllButton() {
-  return SliverPadding(
-    padding: EdgeInsets.only(top: 0),
-    sliver: SliverToBoxAdapter(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Consumer(
-            builder: (context, xRef, child) {
-              var data = xRef.watch(getProductsProvider).value ?? [];
-              return (data.isEmpty)
-                  ? const SizedBox()
-                  : TextButton(
-                    onPressed: () {
-                      removeAllItemsDialog(context, () {
-                        loadingDialog(context, 'Deleting all....');
-                        xRef
-                            .read(productDbProvider.notifier)
-                            .deleteAll(context)
-                            .then((value) => Navigator.pop(context));
-                        Navigator.pop(context);
-                      });
-                    },
-                    child: const Text(
-                      'Delete all',
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                      ),
-                    ),
-                  );
-            },
-          ),
-        ],
-      ),
-    ),
-  );
-}
+// Widget _deleteAllButton() {
+//   return SliverPadding(
+//     padding: EdgeInsets.only(top: 0),
+//     sliver: SliverToBoxAdapter(
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.end,
+//         children: [
+//           Consumer(
+//             builder: (context, xRef, child) {
+//               var data = xRef.watch(getProductsProvider).value ?? [];
+//               return (data.isEmpty)
+//                   ? const SizedBox()
+//                   : TextButton(
+//                     onPressed: () {
+//                       removeAllItemsDialog(context, () {
+//                         loadingDialog(context, 'Deleting all....');
+//                         xRef
+//                             .read(productDbProvider.notifier)
+//                             .deleteAll(context)
+//                             .then((value) => Navigator.pop(context));
+//                         Navigator.pop(context);
+//                       });
+//                     },
+//                     child: const Text(
+//                       'Delete all',
+//                       style: TextStyle(
+//                         color: Colors.orange,
+//                         fontWeight: FontWeight.bold,
+//                         fontSize: 17,
+//                       ),
+//                     ),
+//                   );
+//             },
+//           ),
+//         ],
+//       ),
+//     ),
+//   );
+// }

@@ -48,13 +48,23 @@ class UserImgStateNotifier extends StateNotifier<UserImgState> {
   }
 
   Future<void> getUserImg() async {
-    state = LoadingUserImg();
+    // state = LoadingUserImg();
     try {
       var img = await userDbRepository.getUserFromDB();
 
       state = LoadedSuccessfulyUserImg(file: File(''), imgUrl: img);
     } catch (e) {
       state = ErrorStateUserImg(error: e.toString());
+    }
+  }
+
+  Future<bool> deleteUserImg()async{
+    try {
+      await userDbRepository.deleteUserImg();
+      return true;
+    } catch (e) {
+      state = ErrorStateUserImg(error: e.toString());
+      return false;
     }
   }
 }

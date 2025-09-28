@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sneak_peak/provider/provider_objects.dart';
-import 'package:sneak_peak/repository/admin%20repositories/product_cloud_db_repository.dart';
+import 'package:sneak_peak/repository/admin%20repository/product_cloud_db_repository.dart';
 
 final updateProductImgProvider = StateNotifierProvider<
   UpdateProductImagesNotifier,

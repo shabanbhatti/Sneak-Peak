@@ -1,10 +1,9 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sneak_peak/models/products_modals.dart';
 import 'package:sneak_peak/provider/provider_objects.dart';
-import 'package:sneak_peak/repository/admin%20repositories/product_cloud_db_repository.dart';
+import 'package:sneak_peak/repository/admin%20repository/product_cloud_db_repository.dart';
 
 final productDbProvider =
     StateNotifierProvider<AddProductToFirestoreStateNotifier, ProductState>((
@@ -59,19 +58,19 @@ class AddProductToFirestoreStateNotifier extends StateNotifier<ProductState> {
     }
   }
 
-  Future<void> deleteAll(BuildContext context) async {
-    // try {
-    //   Navigator.pop(context);
-    //   state = ProductLoadingState();
-    //   await productService.deleteAll();
-    //   state = ProductLoadedSuccessfullyState();
+//   Future<void> deleteAll(BuildContext context) async {
+//     // try {
+//     //   Navigator.pop(context);
+//     //   state = ProductLoadingState();
+//     //   await productService.deleteAll();
+//     //   state = ProductLoadedSuccessfullyState();
 
-    //   SnackBarHelper.show('Product deleted successfuly');
-    // } catch (e) {
-    //   state = ProductErrorState();
-    //   SnackBarHelper.show('$e');
-    // }
-  }
+//     //   SnackBarHelper.show('Product deleted successfuly');
+//     // } catch (e) {
+//     //   state = ProductErrorState();
+//     //   SnackBarHelper.show('$e');
+//     // }
+//   }
 }
 
 sealed class ProductState {

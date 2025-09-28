@@ -169,9 +169,6 @@ class _AddProductPageState extends ConsumerState<AddProductPage> {
               ),
             ),
 
-            // ShoesSizes(shoesSized: womenSize, title: 'Women'),
-
-            // ShoesSizes(shoesSized: kidzSize, title: 'Kidz'),
             const ColorsWidget(),
 
             _onButtonClick(),

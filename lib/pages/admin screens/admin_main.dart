@@ -1,17 +1,55 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sneak_peak/controllers/fcm_token_riverpod.dart';
+import 'package:sneak_peak/controllers/get%20shared%20pref%20data%20riverpod/get_sp_data_riverpod.dart';
+import 'package:sneak_peak/controllers/notifications_controllers.dart';
 import 'package:sneak_peak/pages/admin%20screens/home%20page/admin_home.dart';
 import 'package:sneak_peak/pages/admin%20screens/orders%20page/controllers/orders_stream_riverpod.dart';
 import 'package:sneak_peak/pages/admin%20screens/orders%20page/orders_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/profile%20page/admin_profie_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/sales%20chart%20page/admin_sales_chart_page.dart';
+import 'package:sneak_peak/pages/user%20screens/notifications%20page/notifications_page.dart';
 import 'package:sneak_peak/utils/constant_steps.dart';
 
-class AdminMain extends StatelessWidget {
+class AdminMain extends ConsumerStatefulWidget {
   const AdminMain({super.key});
 
   static const pageName = 'admin_main';
+
+  @override
+  ConsumerState<AdminMain> createState() => _AdminMainState();
+}
+
+class _AdminMainState extends ConsumerState<AdminMain> {
+
+
+@override
+  void initState() {
+    super.initState();
+
+    
+  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+     ref.read(fcmTokenProvider.notifier).updateFcm();
+    ref.read(notificationProvider.notifier).notificationPermission();
+    ref.read(notificationProvider.notifier).getFcmToken();
+    ref.read(notificationProvider.notifier).onForegroundNotification((message) {
+      // log('ON FOREGROUND');
+      GoRouter.of(context).pushNamed(NotificationsPage.pageName);
+    },);
+    ref.read(notificationProvider.notifier).onBackgroundNotification((p0) {
+      // log('ON BACKGROND');
+      GoRouter.of(context).pushNamed(NotificationsPage.pageName);
+    },);
+    ref.read(notificationProvider.notifier).onKilledAppNotification((p0) {
+      // log('ON KILLED');
+      GoRouter.of(context).pushNamed(NotificationsPage.pageName);
+    },);
+       ref.read(getSharedPrefDataProvider.notifier).getNameEmailDataFromSP();
+    },);
+  }
+
 
   final List<Widget> pages = const [
     AdminHome(),

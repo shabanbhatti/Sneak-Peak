@@ -25,6 +25,21 @@ String? passwordValidation(String? value) {
   return null;
 }
 
+
+String? phoneNumberValidation(value) {
+    if (value == null || value.isEmpty) {
+      return 'Phone number is required';
+    }
+    if (!RegExp(r'^\d+$').hasMatch(value)) {
+      return 'Only numbers are allowed';
+    }
+    if (value.length != 11) {
+      return 'Phone number must be exactly 11 digits';
+    }
+    return null;
+  }
+
+
 String? nameValidation(String? value) {
   if (value!.isEmpty) {
     return "Name shouldn't be empty";
@@ -33,6 +48,15 @@ String? nameValidation(String? value) {
   } else if (
       value.contains(RegExp('[0-9]'))) {
     return "Name shouldn't contains numbers";
+  }
+
+  return null;
+}
+
+
+String? notNullValidation(String? value) {
+  if (value!.isEmpty) {
+    return "Field shouldn't be empty";
   }
 
   return null;

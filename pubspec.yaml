@@ -61,12 +61,17 @@ dependencies:
   firebase_messaging: ^16.0.1
   app_settings: ^6.1.1
   flutter_local_notifications: ^19.4.1
+  googleapis_auth: ^2.0.0
+  flutter_launcher_icons: ^0.14.4
   
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/shoes__.png"
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

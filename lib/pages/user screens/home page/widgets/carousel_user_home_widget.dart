@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sneak_peak/controllers/banners_stream.dart';
-import 'package:sneak_peak/pages/admin%20screens/home%20page/widgets/caraousel_widget.dart';
 
 class CarouselUserHomeWidget extends StatelessWidget {
   const CarouselUserHomeWidget({super.key, required this.controller});

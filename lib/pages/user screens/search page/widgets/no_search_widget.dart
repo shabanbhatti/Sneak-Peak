@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sneak_peak/controllers/search%20product%20riverpod/search_product_riverpod.dart';
+import 'package:sneak_peak/controllers/search_product_riverpod.dart';
 
 class NoSearchWidget extends ConsumerWidget {
   const NoSearchWidget({super.key});

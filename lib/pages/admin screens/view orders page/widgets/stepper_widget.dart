@@ -3,6 +3,8 @@ import 'package:another_stepper/widgets/another_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:sneak_peak/controllers/notifications_controllers.dart';
+import 'package:sneak_peak/models/notifications_model.dart';
 import 'package:sneak_peak/models/orders_modals.dart';
 import 'package:sneak_peak/pages/admin%20screens/orders%20page/controllers/orders_stream_riverpod.dart';
 import 'package:sneak_peak/pages/admin%20screens/view%20orders%20page/controllers/strepper_stream_riverpod.dart';
@@ -24,10 +26,10 @@ class _AdminStepperWidgetState extends ConsumerState<AdminStepperWidget> {
   Widget build(BuildContext context) {
     print('stepper widget build calld');
     ref.listen(updateStepsProvider, (previous, next) {
-      if (next!='done') {
+      if (next != 'done') {
         SnackBarHelper.show(next, color: Colors.red);
       }
-    },);
+    });
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 10),
       sliver: SliverToBoxAdapter(
@@ -119,11 +121,47 @@ class _AdminStepperWidgetState extends ConsumerState<AdminStepperWidget> {
           textStyle: TextStyle(color: textColor, fontSize: 10),
         ),
         iconWidget: GestureDetector(
-          onTap: ()async {
+          onTap: () async {
             loadingDialog(context, '', color: Colors.transparent);
-            await ref.read(updateStepsProvider.notifier).updateStep(widget.ordersModals ,title,widget.ordersModals.userUid ?? '');
+            await ref
+                .read(updateStepsProvider.notifier)
+                .updateStep(
+                  widget.ordersModals,
+                  title,
+                  widget.ordersModals.userUid ?? '',
+                );
             ref.invalidate(adminOrdersStreamProvider);
             Navigator.pop(context);
+            print(widget.ordersModals.id ?? '');
+            if (title != delivered) {
+              await ref
+                  .read(notificationProvider.notifier)
+                  .sendNotificationToSomeone(
+                    widget.ordersModals.userUid ?? '',
+                    NotificationsModel(
+                      title: 'Your order got $title 🎁🎉',
+                      body: 'Your order is on the way 🚛',
+                      date: DateTime.now().toString(),
+                      isRead: false,
+                      metaDataTitle: 'Your order got $title 🎁🎉',
+                      metaDataBody: 'Your order is on the way 🚛',
+                    ),
+                  );
+            } else {
+              await ref
+                  .read(notificationProvider.notifier)
+                  .sendNotificationToSomeone(
+                    widget.ordersModals.userUid ?? '',
+                    NotificationsModel(
+                      title: 'Your order has delivered 🎁🎉🤩',
+                      body: 'Enjoy your order 🤗❤️✨',
+                      date: DateTime.now().toString(),
+                      isRead: false,
+                      metaDataTitle: 'Your order has delivered 🎁🎉🤩',
+                      metaDataBody: 'Enjoy your order 🤗❤️✨, please give us a rating ⭐',
+                    ),
+                  );
+            }
           },
           child: Icon(Icons.check_circle, color: color),
         ),
@@ -131,4 +169,3 @@ class _AdminStepperWidgetState extends ConsumerState<AdminStepperWidget> {
     });
   }
 }
-

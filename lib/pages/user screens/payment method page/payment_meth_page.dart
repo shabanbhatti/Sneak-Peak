@@ -2,12 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sneak_peak/controllers/notifications_controllers.dart';
 import 'package:sneak_peak/controllers/users%20controller/buy_product_riverpod.dart';
 import 'package:sneak_peak/controllers/users%20controller/pending_orders_riverpod.dart';
 import 'package:sneak_peak/models/cart_poduct_modal.dart';
+import 'package:sneak_peak/models/notifications_model.dart';
 import 'package:sneak_peak/models/orders_modals.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/this%20controllers/check_and_selected_data_list_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/order%20confirmed%20page/order_confrmed_page.dart';
+import 'package:sneak_peak/utils/admin_details.dart';
 import 'package:sneak_peak/utils/constant_steps.dart';
 import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/snack_bar_helper.dart';
@@ -33,6 +36,10 @@ class PaymentMethPage extends ConsumerWidget {
     });
 
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 5,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: Center(
         child: CustomScrollView(
           slivers: [
@@ -75,6 +82,31 @@ class PaymentMethPage extends ConsumerWidget {
                           );
                       Navigator.pop(context);
                       if (isAboutToBuy) {
+                        double totalPrice = cartList.fold(0, (sum, item) => sum + double.parse(item.price!));
+
+                        ref.read(notificationProvider.notifier).userSendNotification(
+                          NotificationsModel(
+                             title: 'Order confirmed!🎉',
+                           body: 'Hurrey! thank you for choosing us 🥳.',
+                            metaDataTitle: '${cartList.map((e) => e.title,)} got ordered 🥳',
+                            date: DateTime.now().toString(),
+                            metaDataBody: 'Order confirmed🎉 |  Total Price: Rs. $totalPrice',
+                            isRead: false
+                          )
+                            );
+
+
+                            ref.read(notificationProvider.notifier).sendNotificationToSomeone(
+                              adminUid,
+                          NotificationsModel(
+                             title: 'New order arrived 🎁',
+                           body: 'The new order has arrived 🎉',
+                            metaDataTitle: '${cartList.map((e) => e.title,)}! NEW ORDER 🥳',
+                            date: DateTime.now().toString(),
+                            metaDataBody: 'Total Price: Rs. $totalPrice',
+                            isRead: false
+                          )
+                            );
                         ref.invalidate(selectedDataList);
                         ref.invalidate(itemCheckProvider);
                         GoRouter.of(

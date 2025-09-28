@@ -1,12 +1,21 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sneak_peak/controllers/get%20shared%20pref%20data%20riverpod/get_sp_data_riverpod.dart';
+import 'package:sneak_peak/controllers/location_riverpod.dart';
+import 'package:sneak_peak/controllers/notifications_controllers.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/cart_page.dart';
 import 'package:sneak_peak/pages/user%20screens/cart%20page/this%20controllers/cart_stream_provider.dart';
 import 'package:sneak_peak/pages/user%20screens/home%20page/home_page.dart';
+import 'package:sneak_peak/pages/user%20screens/notifications%20page/notifications_page.dart';
+import 'package:sneak_peak/pages/user%20screens/profile%20page/controllers/profile_switcher_controller.dart';
 import 'package:sneak_peak/pages/user%20screens/profile%20page/profile_page.dart';
 import 'package:sneak_peak/pages/user%20screens/search%20page/search_page.dart';
+import 'package:sneak_peak/utils/snack_bar_helper.dart';
+
 
 class UserMainPage extends ConsumerStatefulWidget {
   const UserMainPage({super.key});
@@ -22,10 +31,29 @@ class _UserMainPageState extends ConsumerState<UserMainPage> {
 @override
 void initState() {
   super.initState();
+ref.read(getSharedPrefDataProvider.notifier).getNameEmailDataFromSP();
   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-       ref.read(getSharedPrefDataProvider.notifier).getNameEmailDataFromSP();
+    ref.read(locationProvider.notifier).getLocation();
+    ref.read(switcherProvider.notifier).getSwitcher();
+    ref.read(notificationProvider.notifier).notificationPermission();
+    ref.read(notificationProvider.notifier).getFcmToken();
+    ref.read(notificationProvider.notifier).onForegroundNotification((message) {
+      log('ON FOREGROUND');
+     
+      GoRouter.of(context).pushNamed(NotificationsPage.pageName);
+    },);
+    ref.read(notificationProvider.notifier).onBackgroundNotification((p0) {
+      log('ON BACKGROND');
+      GoRouter.of(context).pushNamed(NotificationsPage.pageName);
+    },);
+    ref.read(notificationProvider.notifier).onKilledAppNotification((p0) {
+      log('ON KILLED');
+      GoRouter.of(context).pushNamed(NotificationsPage.pageName);
+    },);
+       
     },);
 }
+
 
 
   final List<Widget> pages = const [
@@ -38,6 +66,12 @@ void initState() {
   @override
   Widget build(BuildContext context) {
     print('ADMIN MAIN BUILD CALLED');
+    ref.listen(notificationProvider, (previous, next) {
+      if (next is ErrorNotification) {
+        var error= next.error;
+        SnackBarHelper.show(error, color: Colors.red);
+      }
+    },);
     return Scaffold(
       bottomNavigationBar: Consumer(
         builder: (context, ref, child) {

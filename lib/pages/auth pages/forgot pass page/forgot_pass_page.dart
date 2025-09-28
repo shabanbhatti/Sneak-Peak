@@ -67,7 +67,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage>
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 50,
-
+backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
           onPressed: () {
             GoRouter.of(context).goNamed(LoginPage.pageName);

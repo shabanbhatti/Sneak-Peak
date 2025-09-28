@@ -6,15 +6,16 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sneak_peak/controllers/get%20shared%20pref%20data%20riverpod/get_sp_data_riverpod.dart';
-import 'package:sneak_peak/controllers/location%20riverpod/location_riverpod.dart';
-import 'package:sneak_peak/controllers/user%20img%20riverpod/user_img_riverpod.dart';
+import 'package:sneak_peak/controllers/location_riverpod.dart';
+import 'package:sneak_peak/controllers/user_img_riverpod.dart';
 import 'package:sneak_peak/controllers/users%20controller/get_product_family_stream_riverpod.dart';
 import 'package:sneak_peak/controllers/users%20controller/search_product_in_home_riverpod.dart';
+import 'package:sneak_peak/pages/user%20screens/notifications%20page/controllers/notification_stream.dart';
+import 'package:sneak_peak/pages/user%20screens/notifications%20page/notifications_page.dart';
 import 'package:sneak_peak/pages/user%20screens/view%20user%20img%20page/view_user_img_page.dart';
 import 'package:sneak_peak/utils/constant_imgs.dart';
 import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/snack_bar_helper.dart';
-
 
 class HomeAppBarWidget extends ConsumerStatefulWidget {
   const HomeAppBarWidget({super.key, required this.controller});
@@ -25,21 +26,22 @@ class HomeAppBarWidget extends ConsumerStatefulWidget {
 }
 
 class _HomeAppBarWidgetState extends ConsumerState<HomeAppBarWidget> {
-
-@override
+  @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(userImgProvider('user_img_home').notifier).getUserImg());
+    Future.microtask(
+      () => ref.read(userImgProvider('user_img_home').notifier).getUserImg(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     ref.listen(userImgProvider('user_img_home'), (previous, next) {
-      if(next is ErrorStateUserImg){
-        var error= next.error;
+      if (next is ErrorStateUserImg) {
+        var error = next.error;
         SnackBarHelper.show(error, color: Colors.red);
       }
-    },);
+    });
     return SliverAppBar(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       expandedHeight: 170,
@@ -54,11 +56,7 @@ class _HomeAppBarWidgetState extends ConsumerState<HomeAppBarWidget> {
                   builder: (context, x, child) {
                     var userImg = x.watch(userImgProvider('user_img_home'));
                     return (userImg is LoadingUserImg)
-                        ? _circleAvatarWidget(
-                          loadingGifUrl,
-                          
-                          () => '',
-                        )
+                        ? _circleAvatarWidget(loadingGifUrl, () => '')
                         : (userImg is LoadedSuccessfulyUserImg)
                         ? InkWell(
                           onLongPress:
@@ -66,28 +64,33 @@ class _HomeAppBarWidgetState extends ConsumerState<HomeAppBarWidget> {
                                 ViewUserImgPage.pageName,
                                 extra: userImg.imgUrl,
                               ),
-                          child: _circleAvatarWidget(userImg.imgUrl, ()async {
+                          child: _circleAvatarWidget(userImg.imgUrl, () async {
                             if (userImg.imgUrl == profileIconUrl) {
                               loadingDialog(context, 'Uploading image...');
-                              var isDone= await x.read(userImgProvider('user_img_home').notifier).takeImage(ImageSource.gallery, );
-                                  Navigator.pop(context);
-                                   if (isDone=='done') {
-                    SnackBarHelper.show('Image uploaded successfully');
-                  }
+                              var isDone = await x
+                                  .read(
+                                    userImgProvider('user_img_home').notifier,
+                                  )
+                                  .takeImage(ImageSource.gallery);
+                              Navigator.pop(context);
+                              if (isDone == 'done') {
+                                SnackBarHelper.show(
+                                  'Image uploaded successfully',
+                                );
+                              }
                             }
                           }),
                         )
-                        : _circleAvatarWidget(
-                          profileIconUrl,
-                          ()async {
-                            loadingDialog(context, 'Uploading image...');
-                           var isDone= await x.read(userImgProvider('user_img_home').notifier).takeImage(ImageSource.gallery, );
-                                Navigator.pop(context);
-                                 if (isDone=='done') {
-                    SnackBarHelper.show('Image uploaded successfully');
-                  }
-                          },
-                        );
+                        : _circleAvatarWidget(profileIconUrl, () async {
+                          loadingDialog(context, 'Uploading image...');
+                          var isDone = await x
+                              .read(userImgProvider('user_img_home').notifier)
+                              .takeImage(ImageSource.gallery);
+                          Navigator.pop(context);
+                          if (isDone == 'done') {
+                            SnackBarHelper.show('Image uploaded successfully');
+                          }
+                        });
                   },
                 ),
                 title: const Text(
@@ -113,13 +116,35 @@ class _HomeAppBarWidgetState extends ConsumerState<HomeAppBarWidget> {
                     );
                   },
                 ),
-                trailing: const CircleAvatar(
-                  radius: 17,
-                  backgroundColor: Colors.orange,
-                  child: Icon(
-                    Icons.notifications,
-                    color: Colors.white,
-                    size: 20,
+                trailing: GestureDetector(
+                  onTap: () async {
+                    // ref.read(notificationProvider.notifier).sendNotification(title: 'Hi there bro', body: 'HMMMMMMM');
+                    GoRouter.of(context).pushNamed(NotificationsPage.pageName);
+                  },
+                  child: Consumer(
+                    builder: (context, x, _) {
+                      var streamList =
+                          x.watch(notificationStreamProvider).value ?? [];
+                      var notiList = streamList.where(
+                        (element) => element.isRead == false,
+                      );
+                      return Badge(
+                        label: Text(notiList.length.toString()),
+                        child: CircleAvatar(
+                          radius: 17,
+                          backgroundColor: Colors.orange,
+                          child: Consumer(
+                            builder: (context, x, _) {
+                              return Icon(
+                                Icons.notifications,
+                                color: Colors.white,
+                                size: 20,
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -250,17 +275,21 @@ Widget _circleAvatarWidget(String imgUrl, void Function()? onTap) {
         clipBehavior: Clip.antiAliasWithSaveLayer,
         height: 50,
         width: 50,
-      
-        decoration: ShapeDecoration(shape:const CircleBorder(), ),
-        child: CachedNetworkImage(imageUrl: imgUrl, fit: BoxFit.cover,progressIndicatorBuilder:
-                  (context, url, progress) => Skeletonizer(
-                    enabled: true,
-                    child: Container(
-                      height: double.infinity,
-                      width: double.infinity,
-                      color: Colors.grey,
-                    ),
-                  ),),
+
+        decoration: ShapeDecoration(shape: const CircleBorder()),
+        child: CachedNetworkImage(
+          imageUrl: imgUrl,
+          fit: BoxFit.cover,
+          progressIndicatorBuilder:
+              (context, url, progress) => Skeletonizer(
+                enabled: true,
+                child: Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  color: Colors.grey,
+                ),
+              ),
+        ),
       ),
     ),
   );

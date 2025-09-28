@@ -90,7 +90,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                           curve: Curves.linear,
                         );
                       } else {
-                        SPHelper.setDeciding(SPHelper.splash ,true);
+                        SPHelper.setBool(SPHelper.splash ,true);
                         GoRouter.of(context).goNamed(LoginPage.pageName);
                       }
                     },

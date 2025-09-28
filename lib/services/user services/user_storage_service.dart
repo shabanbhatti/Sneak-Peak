@@ -18,4 +18,17 @@ class UserStorageService {
     var fullPath = child.fullPath;
     return (imgUrl: url, imgPath: fullPath);
   }
+
+
+Future<void> deleteUserImg(String imgPath)async{
+var storage = firebaseStorage;
+await storage.ref(imgPath).delete();
+}
+
+
+Future<void> deleteAccount(String path)async{
+  await firebaseStorage.ref(path).delete();
+}
+
+
 }

@@ -45,6 +45,10 @@ class _ChangePasswordPage extends ConsumerState<ChangePasswordPage> {
       }
     });
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 5,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: Center(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),

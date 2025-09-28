@@ -32,13 +32,17 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
   Widget build(BuildContext context) {
     ref.listen(authProvider('update_name'), (previous, next) {
       if (next is AuthErrorState) {
-        var error= next.error;
+        var error = next.error;
         SnackBarHelper.show(error, color: Colors.red);
-      }else if(next is AuthLoadedSuccessfulyState){
+      } else if (next is AuthLoadedSuccessfulyState) {
         SnackBarHelper.show('Name update successfuly');
       }
-    },);
+    });
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 5,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: Center(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -95,9 +99,13 @@ class _UpdateUsernamePageState extends ConsumerState<UpdateUsernamePage> {
 
                         if (isNameValidate) {
                           loadingDialog(context, 'Updating username...');
-                          await x.read(authProvider('update_name').notifier).updateUsername(nameController.text.trim(),);
+                          await x
+                              .read(authProvider('update_name').notifier)
+                              .updateUsername(nameController.text.trim());
 
-                          await x.read(getSharedPrefDataProvider.notifier).getNameEmailDataFromSP();
+                          await x
+                              .read(getSharedPrefDataProvider.notifier)
+                              .getNameEmailDataFromSP();
                           Navigator.pop(context);
                           nameController.clear();
                         }

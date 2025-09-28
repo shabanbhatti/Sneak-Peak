@@ -31,6 +31,10 @@ class _WishlistPageState extends ConsumerState<WishlistPage> {
   @override
   Widget build(BuildContext contextX) {
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 5,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: Center(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -47,10 +51,7 @@ class _WishlistPageState extends ConsumerState<WishlistPage> {
                 child: Center(
                   child: Consumer(
                     builder: (context, x, child) {
-                      
-                      var wishlistStream = x.watch(
-                        wishlistStreamProvider,
-                      );
+                      var wishlistStream = x.watch(wishlistStreamProvider);
 
                       return wishlistStream.when(
                         data:
@@ -106,13 +107,25 @@ class _WishlistPageState extends ConsumerState<WishlistPage> {
                                       );
                                     }
                                   },
-                                  onRemove: () async{
-                                    loadingDialog(contextX, 'Removing from wishlist');
-                            var isDone= await x.read(wishlistProvider(productModal.id ?? '',).notifier,).removeFromWishlist(cartModal,);
-                            Navigator.pop(contextX);
-                            if (isDone==false) {
-                              SnackBarHelper.show('Something went wrong', color: Colors.red);
-                            }
+                                  onRemove: () async {
+                                    loadingDialog(
+                                      contextX,
+                                      'Removing from wishlist',
+                                    );
+                                    var isDone = await x
+                                        .read(
+                                          wishlistProvider(
+                                            productModal.id ?? '',
+                                          ).notifier,
+                                        )
+                                        .removeFromWishlist(cartModal);
+                                    Navigator.pop(contextX);
+                                    if (isDone == false) {
+                                      SnackBarHelper.show(
+                                        'Something went wrong',
+                                        color: Colors.red,
+                                      );
+                                    }
                                   },
                                   icon: Icons.favorite,
                                   color: Colors.red,

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sneak_peak/provider/provider_objects.dart';
-import 'package:sneak_peak/repository/admin%20repositories/product_cloud_db_repository.dart';
+import 'package:sneak_peak/repository/admin%20repository/product_cloud_db_repository.dart';
 import 'package:sneak_peak/utils/constant_brands.dart';
 
 final flChartProvider = StateNotifierProvider<
@@ -78,6 +78,7 @@ class FlChartStateNotifier
         error: '',
       );
     } catch (e) {
+      print('------------------------$e');
       state = (
         ndure: 0,
         bata: 0,
@@ -92,7 +93,26 @@ class FlChartStateNotifier
 
   Future<void> initialize() async {
     try {
+      state = (
+      ndure: 0,
+      bata: 0,
+      servis: 0,
+      stylo: 0,
+      isLoading: true,
+      isError: false,
+      error: '',
+    );
       await productRepository.initializeFlChart();
+
+       state = (
+      ndure: 0,
+      bata: 0,
+      servis: 0,
+      stylo: 0,
+      isLoading: false,
+      isError: false,
+      error: '',
+    );
     } catch (e) {
       state = (
         ndure: 0,

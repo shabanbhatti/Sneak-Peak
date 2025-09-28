@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sneak_peak/controllers/get%20products%20stream%20provider/get_products_stream.dart';
-import 'package:sneak_peak/controllers/search%20product%20riverpod/search_product_riverpod.dart';
+import 'package:sneak_peak/controllers/get_products_stream.dart';
+import 'package:sneak_peak/controllers/search_product_riverpod.dart';
 import 'package:sneak_peak/utils/constants_imgs_paths.dart';
 
 Widget adminSliverAppBar(
@@ -10,23 +10,22 @@ Widget adminSliverAppBar(
   TextEditingController controller,
   FocusNode focusNode,
   BuildContext context,
+  Widget? widget,
 ) {
   return SliverAppBar(
     backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     snap: true,
     floating: true,
-    leading: Padding(
-      padding: EdgeInsets.all(8),
-      child: CircleAvatar(backgroundImage: AssetImage(imgLogo)),
-    ),
+    leading: Padding(padding: EdgeInsets.all(8), child: Image.asset(imgLogo)),
     centerTitle: true,
     expandedHeight: 120,
     title: Text(title, style: const TextStyle()),
+    actions: [widget ?? const SizedBox()],
     flexibleSpace: FlexibleSpaceBar(
       background: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Spacer(flex: 7),
+          const Spacer(flex: 7),
           Expanded(
             flex: 5,
             child: Padding(
@@ -54,17 +53,6 @@ Widget adminSliverAppBar(
                             .onChanged(value, streamDataList.value ?? []);
                       },
                     );
-                    //      CustomTextfields(
-                    //   controller: controller,
-                    //   prefix: Icons.search,
-                    //   title: 'Search',
-                    //   focusNode: focusNode,
-                    //   isObscure: false,
-                    //   validator: (p0) => '',
-                    //   onChanged: (v) {
-                    //
-                    //   },
-                    // );
                   },
                 ),
               ),

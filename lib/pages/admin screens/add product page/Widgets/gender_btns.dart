@@ -22,7 +22,7 @@ class GenderBtns extends ConsumerWidget {
                             var isChecked = genderBtnRef.watch(
                               checkedBtnProvider(e.person),
                             );
-                            var sizesList= genderBtnRef.watch(shoesSizesProvider);
+                            // var sizesList= genderBtnRef.watch(shoesSizesProvider);
                             return GenderCetagoryCollectionBtn(
                               title: e.person,
                               onTap: () {

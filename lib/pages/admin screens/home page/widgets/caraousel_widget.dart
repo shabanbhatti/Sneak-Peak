@@ -36,6 +36,7 @@ class CaraouselWidget extends StatelessWidget {
           child: Consumer(
             builder: (context, ref, child) {
               var banners = ref.watch(bannersProvider);
+              print(banners.value);
               return banners.when(
                 data:
                     (data) =>

@@ -69,18 +69,20 @@ class _IntroPageState extends ConsumerState<IntroPage>
               SizedBox(height: MediaQuery.of(context).size.height * 0.3),
               FadeTransition(
                 opacity: fade,
-                child: CircleAvatar(
-                  radius: 100,
-                  backgroundColor: Colors.transparent,
-                  backgroundImage: AssetImage(imgLogo),
+                child: Container(
+                  height: 165,
+                  width: 165,
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  decoration: ShapeDecoration(shape: const CircleBorder()),
+                  child: Image.asset(imgLogo),
                 ),
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _textLogoWidget(leftSlide, fade, textSneakLogo, context),
-                  _textLogoWidget(rightSlide, fade, textPeakLogo, context),
+                  _textLogoWidget(leftSlide, fade, '𝐒Пҽαк', context),
+                  _textLogoWidget(rightSlide, fade, 'Pҽαƙ', context),
                 ],
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.2),
@@ -112,11 +114,12 @@ Widget _textLogoWidget(
 ) {
   return SlideTransition(
     position: position,
-    child: Image.asset(
-      imgPath,
-      height: MediaQuery.of(context).size.height * 0.05,
-      fit: BoxFit.fitHeight,
-    ),
+    child: Text('$imgPath ', style: TextStyle(fontSize: 40)),
+    // child: Image.asset(
+    //   imgPath,
+    //   height: MediaQuery.of(context).size.height * 0.05,
+    //   fit: BoxFit.fitHeight,
+    // ),
   );
 }
 

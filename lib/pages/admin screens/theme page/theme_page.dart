@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sneak_peak/utils/app%20theme/app_theme.dart';
+import 'package:sneak_peak/theme/theme.dart';
 import 'package:sneak_peak/widgets/admin%20app%20bar/transparent_app_bar.dart';
 import 'package:sneak_peak/widgets/list%20tile%20widget/list_tile_widget.dart';
 

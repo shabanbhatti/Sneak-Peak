@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/controllers/cross%20fade%20anim%20riverpod/cross_fade_anim_riverpod.dart';
+import 'package:sneak_peak/controllers/cross_fade_anim_riverpod.dart';
 import 'package:sneak_peak/pages/user%20screens/completed%20orders%20page/widgets/completed_data_widget.dart';
 import 'package:sneak_peak/pages/user%20screens/completed%20orders%20page/widgets/completed_no_data_widget.dart';
 import 'package:sneak_peak/pages/user%20screens/to%20ship%20page/controllers/to_ship_stream_riverpod.dart';
@@ -30,6 +30,10 @@ class _CompletedPageState extends ConsumerState<CompletedPage> {
   Widget build(BuildContext contextX) {
     print('Completed order page build called');
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 5,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: Center(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),

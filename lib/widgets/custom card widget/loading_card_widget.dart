@@ -6,100 +6,87 @@ class LoadingCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 145,
-      width: double.infinity,
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      decoration: BoxDecoration(
-        // borderRadius: BorderRadius.circular(8),
-        border: Border(
-          bottom: BorderSide(width: 1, color: Colors.grey.withAlpha(100)),
+    return  Container(
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withAlpha(150),
+              offset: const Offset(0, 1),
+              blurStyle: BlurStyle.outer,
+              blurRadius: 5,
+            ),
+          ],
         ),
-        color: Theme.of(context).scaffoldBackgroundColor,
-      ),
-      child: Row(
-        children: [
-          Flexible(
-            flex: 3,
-            child: Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
+          children: [
+            Expanded(
+              flex: 10,
+              child: Skeletonizer(
+                child: Container(
+                  color: Colors.grey.withAlpha(50),
+                
+                ),
+              ),
+            ),
+            const Spacer(flex: 1),
+            Expanded(
+              flex: 2,
+              child: Row(
                 children: [
-                  Flexible(
-                    child: Skeletonizer(
-                      child: Container(
-                        height: 100,
-                        width: 100,
-                        color: Colors.grey,
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 7),
+                      child: Text(
+                        'sdfswefswf',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.5,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-          Expanded(
-            flex: 5,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 7),
-                            child: Skeletonizer(
-                              enabled: true,
-                              child: const Text(
-                                'productModal.title',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ),
-                          ),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        'Rs. sfsdf',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange,
+                          fontSize: 14,
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 7),
-                            child: Skeletonizer(
-                              child: const Text(
-                                'Rs. 2000',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.orange,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
+              
+                    Expanded(
+                          flex: 3,
+                          child: Text(
+                            '⭐',
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Spacer(flex: 1),
-                ],
+                        )
+                      
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+            const Spacer(flex: 1),
+          ],
+        ),
+      );
   }
 }

@@ -33,6 +33,10 @@ class _CheckOutPageState extends ConsumerState<CheckOutPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 5,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       bottomNavigationBar: _bottomBar(),
       body: Center(
         child: CustomScrollView(

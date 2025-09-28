@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sneak_peak/models/auth_modal.dart';
 import 'package:sneak_peak/provider/provider_objects.dart';
 import 'package:sneak_peak/repository/auth%20repository/auth_repository.dart';
-import 'package:sneak_peak/utils/admin_email.dart';
+import 'package:sneak_peak/utils/admin_details.dart';
 
 final authProvider =
     StateNotifierProvider.family<AuthStateNotifier, AuthState, String>((
@@ -28,6 +28,18 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       return true;
     } catch (e) {
       state = AuthErrorState(error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> deleteAccount(String password)async{
+    try {
+      state = AuthLoadingState();
+      await authRepository.deleteAccount(password);
+      state = AuthLoadedSuccessfulyState();
+      return true;
+    } catch (e) {
+      state= AuthErrorState(error: e.toString());
       return false;
     }
   }

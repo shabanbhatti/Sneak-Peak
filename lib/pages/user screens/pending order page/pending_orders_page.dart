@@ -44,6 +44,10 @@ class _PendingOrdersState extends ConsumerState<PendingOrders> {
       }
     },);
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 5,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: Center(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),

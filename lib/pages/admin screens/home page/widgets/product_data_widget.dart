@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sneak_peak/controllers/admin%20controllers/product_db_riverpod.dart';
-import 'package:sneak_peak/controllers/get%20products%20stream%20provider/get_products_stream.dart';
-import 'package:sneak_peak/controllers/search%20product%20riverpod/search_product_riverpod.dart';
+import 'package:sneak_peak/controllers/get_products_stream.dart';
+import 'package:sneak_peak/controllers/search_product_riverpod.dart';
 import 'package:sneak_peak/pages/admin%20screens/update%20product%20page/update_product_page.dart';
 import 'package:sneak_peak/utils/dialog%20boxes/loading_dialog.dart';
 import 'package:sneak_peak/utils/dialog%20boxes/remove_product_dialog.dart';
@@ -48,6 +48,7 @@ class ProductDataWidget extends ConsumerWidget {
                       final product = list[list.length - 1 - index];
                       print(list[index].title);
                       return CustomCardWidget(
+                        
                         productModal: product,
                         onRemove: () {
                           showRemoveItemDialog(context, () async {

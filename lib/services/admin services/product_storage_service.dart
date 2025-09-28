@@ -27,6 +27,23 @@ Future<({List<String> imgLinks, List<String> imgPaths})> addProductFileToStorage
       return (imgLinks: imgUrls, imgPaths: storageImgPaths);
   }
 
+Future<List<({String imgLinks, String imgPaths})>> addProductFileToStorageForBanners(List<File> imgFileList, String refPath) async {
+    var storage = firebaseStorage.ref(refPath);
+    List<({String imgLinks, String imgPaths})> dataList=[];
+     
+      for (var index in imgFileList) {
+        var child = storage.child(
+          DateTime.now().microsecondsSinceEpoch.toString(),
+        );
+        await child.putFile(index);
+
+        var link = await child.getDownloadURL();
+       
+        dataList.add((imgLinks: link, imgPaths: child.fullPath));
+      }
+      return dataList;
+  }
+
 
 Future<({List<String> imgLinks, List<String> imgPaths})> updateProductImages(List<File> imgFileList, List<String> imgLinks, List<String> imgPaths) async {
     var storage = firebaseStorage.ref('product_imgs');

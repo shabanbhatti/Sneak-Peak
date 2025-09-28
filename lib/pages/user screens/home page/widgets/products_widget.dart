@@ -17,15 +17,15 @@ class ProductsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext contextx) {
     return SliverPadding(
-      padding: EdgeInsets.symmetric( horizontal: 12),
+      padding: EdgeInsets.symmetric(horizontal: 12),
       sliver: SliverToBoxAdapter(
         child: Container(
           color: Colors.transparent,
-          height: 230,
+          height: 300,
           child: Column(
             children: [
               Expanded(
-                flex: 2,
+                flex: 5,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -36,7 +36,7 @@ class ProductsWidget extends StatelessWidget {
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
-                          shadows: [
+                          shadows: const [
                             BoxShadow(
                               offset: Offset(0, 0),
                               color: Colors.black,
@@ -59,10 +59,10 @@ class ProductsWidget extends StatelessWidget {
                                 print(dataTitle);
                                 GoRouter.of(contextx).pushNamed(
                                   SeeAllPage.pageName,
-                                  extra:(dataTitle != '')
-                                            ? dataTitle
-                                            : 'allfeatures' ,
-                                 
+                                  extra:
+                                      (dataTitle != '')
+                                          ? dataTitle
+                                          : 'allfeatures',
                                 );
                               },
                               child: const Text(

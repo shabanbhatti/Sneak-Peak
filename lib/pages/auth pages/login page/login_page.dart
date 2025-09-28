@@ -43,7 +43,10 @@ class _LoginPageState extends ConsumerState<LoginPage>
       duration: const Duration(milliseconds: 500),
     );
 
-    slide = Tween<Offset>(begin:const Offset(0.0, -0.5), end: Offset.zero).animate(
+    slide = Tween<Offset>(
+      begin: const Offset(0.0, -0.5),
+      end: Offset.zero,
+    ).animate(
       CurvedAnimation(parent: animationController, curve: Curves.easeInOutBack),
     );
     animationController.forward();
@@ -65,18 +68,18 @@ class _LoginPageState extends ConsumerState<LoginPage>
     ref.listen(authProvider('login'), (previous, next) {
       if (next is AuthErrorState) {
         var error = next.error;
-        
+
         SnackBarHelper.show(error, color: Colors.red);
       }
-    },);
+    });
     ref.listen(authProvider('google'), (previous, next) {
       if (next is AuthErrorState) {
         var error = next.error;
         SnackBarHelper.show(error, color: Colors.red);
       }
-    },);
+    });
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 10),
+      appBar: AppBar(toolbarHeight: 10, backgroundColor: Theme.of(context).scaffoldBackgroundColor,),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -95,22 +98,28 @@ class _LoginPageState extends ConsumerState<LoginPage>
                   const SizedBox(height: 10),
                   Consumer(
                     builder: (context, authRef, child) {
-                      var loginAuth= authRef.watch(authProvider('login'));
-                      var googleAuth= authRef.watch(authProvider('google'));
+                      var loginAuth = authRef.watch(authProvider('login'));
+                      var googleAuth = authRef.watch(authProvider('google'));
                       return CustomButton(
-                    btnTitleWidget: (loginAuth is AuthLoadingState|| googleAuth is AuthLoadingState)?const CupertinoActivityIndicator(color: Colors.white,):const Text(
-                      'Login',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onTap: () {
-                      _onLogin(authRef);
+                        btnTitleWidget:
+                            (loginAuth is AuthLoadingState ||
+                                    googleAuth is AuthLoadingState)
+                                ? const CupertinoActivityIndicator(
+                                  color: Colors.white,
+                                )
+                                : const Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        onTap: () {
+                          _onLogin(authRef);
+                        },
+                      );
                     },
-                  );
-                    },
-                    ),
+                  ),
                   const SizedBox(height: 65),
                   Text(
                     '-- Or continue with --',
@@ -130,31 +139,40 @@ class _LoginPageState extends ConsumerState<LoginPage>
     );
   }
 
-void _onLogin(WidgetRef authRef)async{
+  void _onLogin(WidgetRef authRef) async {
+    var emailValidation = emailKey.currentState!.validate();
+    var passwordValidation = passKey.currentState!.validate();
 
-var emailValidation= emailKey.currentState!.validate();
-var passwordValidation= passKey.currentState!.validate();
-
-if (emailValidation&&passwordValidation) {
-loadingDialog(context, 'Signing you in...');
-  var isLogin= await authRef.read(authProvider('login').notifier).loginAccount(emailController.text.trim(), passController.text.trim(),);
-  if (mounted) {
-    Navigator.pop(context);
-  if (isLogin=='admin') {
-     GoRouter.of(context).goNamed(AdminMain.pageName);
-  }else if(isLogin=='user'){
-GoRouter.of(context).goNamed(UserMainPage.pageName);
+    if (emailValidation && passwordValidation) {
+      loadingDialog(context, 'Signing you in...');
+      var isLogin = await authRef
+          .read(authProvider('login').notifier)
+          .loginAccount(
+            emailController.text.trim(),
+            passController.text.trim(),
+          );
+      if (mounted) {
+        Navigator.pop(context);
+        if (isLogin == 'admin') {
+          GoRouter.of(context).goNamed(AdminMain.pageName);
+        } else if (isLogin == 'user') {
+          GoRouter.of(context).goNamed(UserMainPage.pageName);
+        } else {
+          // SnackBarHelper.show(
+          //   'Something went wrong! please check, is your email verified?.',
+          //   color: Colors.red,
+          //   duration:const Duration(seconds: 10)
+          // );
+        }
+      }
+    }
   }
-  }
-  
-}
-}
 }
 
 Widget _topTitle() {
   return Padding(
     padding: EdgeInsets.all(17),
-    child:const Row(
+    child: const Row(
       children: [
         Text(
           'Login\naccount!',
@@ -225,8 +243,6 @@ Widget _forgotPasswordButton(BuildContext context) {
     ],
   );
 }
-
-
 
 Widget _signUpByPage(BuildContext context) {
   return Row(

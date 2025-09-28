@@ -4,11 +4,14 @@ class SnackBarHelper {
   static final GlobalKey<ScaffoldMessengerState> messengerKey =
       GlobalKey<ScaffoldMessengerState>();
 
-  static void show(String title, {Color color = Colors.green, Duration duration=const Duration(seconds: 2)}) {
-    
+  static void show(
+    String title, {
+    Color color = Colors.green,
+    Duration duration = const Duration(seconds: 2),
+  }) {
     messengerKey.currentState?.showSnackBar(
       SnackBar(
-        content: Text(title),
+        content: Text(title, style: const TextStyle(color: Colors.white)),
         backgroundColor: color,
         duration: duration,
         // padding: EdgeInsets.all(20),

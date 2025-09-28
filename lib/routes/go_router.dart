@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sneak_peak/Notifications/firebase_noti_page.dart';
 import 'package:sneak_peak/models/address_modal.dart';
 import 'package:sneak_peak/models/cart_poduct_modal.dart';
 import 'package:sneak_peak/models/orders_modals.dart';
@@ -10,7 +9,8 @@ import 'package:sneak_peak/pages/admin%20screens/add%20product%20page/admin_add_
 import 'package:sneak_peak/pages/admin%20screens/admin_main.dart';
 import 'package:sneak_peak/pages/admin%20screens/completed%20orders%20page/admin_completed_orders_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/edit%20name%20page/admin_edit_name_page.dart';
-import 'package:sneak_peak/pages/admin%20screens/theme%20page/admin_theme_page.dart';
+import 'package:sneak_peak/pages/admin%20screens/send%20notification%20page/send_notification_page.dart';
+import 'package:sneak_peak/pages/admin%20screens/theme%20page/theme_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/update%20product%20page/update_product_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/view%20order%20page%20from%20settings/view_admin_order_page.dart';
 import 'package:sneak_peak/pages/admin%20screens/view%20orders%20page/view_orders_page.dart';
@@ -25,6 +25,7 @@ import 'package:sneak_peak/pages/user%20screens/cancellation%20page/cancellation
 import 'package:sneak_peak/pages/user%20screens/change%20password%20page/change_password_page.dart';
 import 'package:sneak_peak/pages/user%20screens/check%20out%20page/check_out_page.dart';
 import 'package:sneak_peak/pages/user%20screens/completed%20orders%20page/completed_orders_page.dart';
+import 'package:sneak_peak/pages/user%20screens/notifications%20page/notifications_page.dart';
 import 'package:sneak_peak/pages/user%20screens/order%20confirmed%20page/order_confrmed_page.dart';
 import 'package:sneak_peak/pages/user%20screens/payment%20method%20page/payment_meth_page.dart';
 import 'package:sneak_peak/pages/user%20screens/pending%20order%20page/pending_orders_page.dart';
@@ -52,9 +53,9 @@ class AppGoRouter {
       ),
 
        GoRoute(
-        name: FirebaseNotiPage.pageName,
-        path: '/firebase_noti',
-        builder: (context, state) => const FirebaseNotiPage(),
+        name: NotificationsPage.pageName,
+        path: '/notifications',
+        pageBuilder: (context, state) => CupertinoPage(child: const NotificationsPage()),
       ),
 
       GoRoute(
@@ -128,6 +129,14 @@ class AppGoRouter {
 
         pageBuilder:
             (context, state) => CupertinoPage(child: const ThemePage()),
+      ),
+
+      GoRoute(
+        name: SendNotificationPage.pageName,
+        path: '/send_notification',
+
+        pageBuilder:
+            (context, state) => CupertinoPage(child: const SendNotificationPage()),
       ),
 
        GoRoute(
