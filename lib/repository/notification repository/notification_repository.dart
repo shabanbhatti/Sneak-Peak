@@ -29,14 +29,31 @@ class NotificationRepository {
     }
   }
 
+  Future<void> subscribeToTopic(String topic) async {
+    try {
+      await notificationService.subsctibeToTopic(topic);
+    }on FirebaseException catch (e) {
+      throw Exception(e.code);
+    }
+  }
+
   Future<void> sendNotificationsToAll(
     NotificationsModel notificationModel,
   ) async {
     try {
-      var uidsAndToken = await userServices.getAllUsersFcmTokenAndUid();
-      for (var index in uidsAndToken) {
+        await sendNotificationsService.sendNotification(
+            title: notificationModel.title ?? '',
+            body: notificationModel.body ?? '',
+            data: {
+              'title': notificationModel.metaDataTitle ?? '',
+              'body': notificationModel.metaDataBody ?? '',
+            },
+            isForAll: true
+          );
+      var uids = await userServices.getAllUsersUid();
+      for (var index in uids) {
         String uid = index.uid;
-        String fcm = index.token;
+        
         if (uid != adminUid) {
           var id = DateTime.now().microsecondsSinceEpoch;
           log(id.toString());
@@ -45,15 +62,7 @@ class NotificationRepository {
           print(uid);
           await userServices.addNotifications(uid, id, notificationModel);
 
-          await sendNotificationsService.sendNotification(
-            token: fcm,
-            title: notificationModel.title ?? '',
-            body: notificationModel.body ?? '',
-            data: {
-              'title': notificationModel.metaDataTitle ?? '',
-              'body': notificationModel.metaDataBody ?? '',
-            },
-          );
+        
         }
       }
     } on FirebaseException catch (e) {
@@ -61,7 +70,7 @@ class NotificationRepository {
     }
   }
 
-  Future<void> sendNotificationToUserFromAdmin(
+  Future<void> sendNotificationToSomeone(
     String uid,
     NotificationsModel notificationModel,
   ) async {

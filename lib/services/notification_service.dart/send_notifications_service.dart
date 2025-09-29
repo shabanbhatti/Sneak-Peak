@@ -6,7 +6,7 @@ class SendNotificationsService {
 
  final String url= 'https://fcm.googleapis.com/v1/projects/western-oarlock-466702-d3/messages:send';
   
- Future<void> sendNotification({required String token,required String title,required String body, Map<String,dynamic>? data})async{
+ Future<void> sendNotification({ String? token,required String title,required String body, Map<String,dynamic>? data, bool? isForAll})async{
 
 var serverKey= await GetServerKey.getServerKey();
 
@@ -17,7 +17,8 @@ Map<String, String> headers={
   'authorization':'Bearer $serverKey'
 };
 
-Map<String, dynamic> notification={
+if (isForAll==false || isForAll==null) {
+  Map<String, dynamic> notification={
    "message":{
       "token":token,
       "notification":{
@@ -34,6 +35,26 @@ if (response.statusCode==200|| response.statusCode==201) {
   log('SUCCESSFULLY API POST 200');
 }else{
   log('FAILED 404');
+}
+}else{
+   Map<String, dynamic> notification={
+   "message":{
+      "topic":"all",
+      "notification":{
+        "body":body,
+        "title":title
+      },
+      'data': data
+   }
+};
+
+final response=await http.post(Uri.parse(url), headers: headers, body: jsonEncode(notification));
+
+if (response.statusCode==200|| response.statusCode==201) {
+  log('SUCCESSFULLY API POST 200');
+}else{
+  log('FAILED 404');
+}
 }
 
 }

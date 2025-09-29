@@ -20,21 +20,18 @@ class UserCloudDbServices {
     });
   }
 
-Future<List<({String uid, String token})>> getAllUsersFcmTokenAndUid() async {
+Future<List<({String uid})>> getAllUsersUid() async {
   var db = firestore.collection('users');
   var get = await db.get();
   var docs = get.docs;
 
-  List<({String uid, String token})> users = [];
+  List<({String uid})> users = [];
 
   for (var doc in docs) {
-    
-    if (doc.data().containsKey('fcm_token')) {
-    String token = doc['fcm_token'] ?? '';  
     String uid = doc['uid'] ?? '';
-      if (token.isNotEmpty && uid.isNotEmpty) {
-      users.add((uid: uid, token: token));
-    }
+      if ( uid.isNotEmpty) {
+      users.add((uid: uid));
+    
     }
   }
   return users;

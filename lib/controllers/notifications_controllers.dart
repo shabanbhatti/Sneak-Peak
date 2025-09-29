@@ -33,13 +33,7 @@ class NotificationStateNotifier extends StateNotifier<NotificationState> {
     }
   }
 
-  // Future<void> addNotificatonToDatabase(NotificationsModel notificationModel )async{
-  //   try {
-  //     await notificationRepository.sendNotification(notificationModel);
-  //   } catch (e) {
-  //     state= ErrorNotification(error: e.toString());
-  //   }
-  // }
+
 
   Future<bool> sendNotificatonToAll(
     NotificationsModel notificationModel,
@@ -57,13 +51,24 @@ class NotificationStateNotifier extends StateNotifier<NotificationState> {
     }
   }
 
+
+Future<void> subscribeToTopic(String topic) async {
+    try {
+      state = LoadingNotification();
+      await notificationRepository.subscribeToTopic(topic);
+      state = LoadedNotification();
+    } catch (e) {
+      state = ErrorNotification(error: e.toString());
+    }
+  }
+
   Future<void> sendNotificationToSomeone(
     String uid,
     NotificationsModel notificationModel,
   ) async {
     try {
       state = LoadingNotification();
-      await notificationRepository.sendNotificationToUserFromAdmin(
+      await notificationRepository.sendNotificationToSomeone(
         uid,
         notificationModel,
       );

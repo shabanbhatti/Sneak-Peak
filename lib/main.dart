@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sneak_peak/controllers/notifications_controllers.dart';
 import 'package:sneak_peak/firebase_options.dart';
 import 'package:sneak_peak/pages/admin%20screens/theme%20page/theme_page.dart';
 import 'package:sneak_peak/routes/go_router.dart';
@@ -25,6 +26,7 @@ void main() async {
   // log(x);
   var ref = ProviderContainer();
   await ref.read(themeProvider.notifier).getTheme();
+  await ref.read(notificationProvider.notifier).subscribeToTopic('all');
   runApp(UncontrolledProviderScope(container: ref, child: const MyApp()));
 }
 

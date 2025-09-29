@@ -14,19 +14,22 @@ import 'package:sneak_peak/utils/snack_bar_helper.dart';
 import 'package:sneak_peak/widgets/animated%20loading/animated_loading_widget.dart';
 import 'package:sneak_peak/widgets/custom%20sliver%20app%20bar/custom_sliverappbar.dart';
 
-class NotificationsPage extends StatefulWidget {
+class NotificationsPage extends ConsumerStatefulWidget {
   const NotificationsPage({super.key});
   static const pageName = 'notification_page';
 
   @override
-  State<NotificationsPage> createState() => _NotificationsPageState();
+  ConsumerState<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {
+class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   @override
   void initState() {
     super.initState();
     checkNotificationToggle();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.invalidate(notificationStreamProvider);
+    });
   }
 
   void checkNotificationToggle() async {

@@ -103,6 +103,11 @@ class NotificationService {
     }
   }
 
+  Future<void> subsctibeToTopic(String topic) async {
+    await firebaseMessaging.subscribeToTopic(topic);
+    log('Subcribed to $topic doneee');
+  }
+
   void firebaseInit({
     required void Function(RemoteMessage remoteMessage) handleRedirection,
   }) {
