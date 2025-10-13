@@ -19,9 +19,7 @@ import 'package:sneak_peak/utils/snack_bar_helper.dart';
 
 class UserMainPage extends ConsumerStatefulWidget {
   const UserMainPage({super.key});
-
   static const pageName = 'user_main';
-
   @override
   ConsumerState<UserMainPage> createState() => _UserMainPageState();
 }
@@ -106,7 +104,8 @@ ref.read(getSharedPrefDataProvider.notifier).getNameEmailDataFromSP();
             ],
           );
         },
-      ),
+      ),      
+                  
       body: Consumer(
         builder: (context, naviRef, child) {
           var navi = naviRef.watch(naviProvider);

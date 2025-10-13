@@ -112,7 +112,7 @@ class NotificationService {
     required void Function(RemoteMessage remoteMessage) handleRedirection,
   }) {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      log('FUCLLLLLLLKKKKKKK');
+      log('FU----------');
       if (message.notification != null) {
         await initializeLocalNotifications(
           remoteMessage: message,
@@ -136,19 +136,20 @@ class NotificationService {
     required void Function(RemoteMessage remoteMessage) handleRedirection,
   }) async {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      log('FUCLLLLLLLKKKKKKK BACKGROUND');
+      log(' BACKGROUND');
       if (message.notification != null && message.notification?.title != null) {
         handleRedirection(message);
       }
     });
   }
+  
 
   bool isKilled = false;
   Future<void> onKilledAppNotifications({
     required void Function(RemoteMessage remoteMessage) handleRedirection,
   }) async {
     if (isKilled) return;
-    log('FUCLLLLLLLKKKKKKK KILLED');
+    log(' KILLED');
     await FirebaseMessaging.instance.getInitialMessage().then((message) {
       if (message?.notification != null &&
           message?.notification?.title != null &&
@@ -199,3 +200,4 @@ class NotificationService {
     );
   }
 }
+
