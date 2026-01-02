@@ -17,7 +17,7 @@ class CustomDropDownMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       validator: (value) {
         if (value == null) {
           return 'Field should not be empty';

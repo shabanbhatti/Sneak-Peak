@@ -61,9 +61,9 @@ class _ChangePasswordPage extends ConsumerState<ChangePasswordPage> {
 
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-              sliver: Form(
-                key: oldPasswordkey,
-                child: SliverToBoxAdapter(
+              sliver: SliverToBoxAdapter(
+                child: Form(
+                  key: oldPasswordkey,
                   child: CustomTextfields(
                     controller: oldPasswordController,
                     title: 'Old password',
@@ -78,9 +78,9 @@ class _ChangePasswordPage extends ConsumerState<ChangePasswordPage> {
 
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              sliver: Form(
-                key: newPasswordkey,
-                child: SliverToBoxAdapter(
+              sliver: SliverToBoxAdapter(
+                child: Form(
+                  key: newPasswordkey,
                   child: CustomTextfields(
                     controller: newPasswordController,
                     title: 'New password',
@@ -136,7 +136,6 @@ class _ChangePasswordPage extends ConsumerState<ChangePasswordPage> {
                           if (isChanged) {
                             newPasswordController.clear();
                             oldPasswordController.clear();
-                            
                           }
                         }
                       },

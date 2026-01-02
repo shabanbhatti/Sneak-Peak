@@ -109,7 +109,7 @@ class _AdminMainState extends ConsumerState<AdminMain> {
 }
 
 class _OrderIconWithBadge extends StatelessWidget {
-  const _OrderIconWithBadge({super.key});
+  const _OrderIconWithBadge();
 
   @override
   Widget build(BuildContext context) {

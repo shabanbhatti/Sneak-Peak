@@ -15,13 +15,12 @@ GlobalKey<ScaffoldMessengerState> snackBarContext =
 @pragma('vm:entry-point')
 Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
- FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
+  FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
   // var x= await GetServerKey.getServerKey();
   // log(x);
   var ref = ProviderContainer();
@@ -29,7 +28,6 @@ void main() async {
   await ref.read(notificationProvider.notifier).subscribeToTopic('all');
   runApp(UncontrolledProviderScope(container: ref, child: const MyApp()));
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

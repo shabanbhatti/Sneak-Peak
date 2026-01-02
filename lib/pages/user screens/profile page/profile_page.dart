@@ -139,7 +139,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 builder: (context, v, _) {
                   var value = v.watch(switcherProvider);
                   return Switch(
-                    activeColor: Colors.white,
+                    activeThumbColor: Colors.white,
                     activeTrackColor: Colors.grey.withAlpha(100),
                     value: value,
                     onChanged: (value) async {

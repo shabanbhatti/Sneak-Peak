@@ -16,130 +16,138 @@ class BottomBarButtonsWidget extends StatelessWidget {
   final String? id;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 70,
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        border: Border(
-          bottom: BorderSide(width: 1, color: Colors.grey.withAlpha(100)),
-          top: BorderSide(color: Colors.grey.withAlpha(100), width: 1),
+    return SafeArea(
+      child: Container(
+        width: double.infinity,
+        height: 70,
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          border: Border(
+            bottom: BorderSide(width: 1, color: Colors.grey.withAlpha(100)),
+            top: BorderSide(color: Colors.grey.withAlpha(100), width: 1),
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 10,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 7),
-              child: Consumer(
-                builder: (context, x, child) {
-                  return CustomButton(
-                    btnTitle: 'Buy now',
-                    onTap: () {
-                      if (productModal != null) {
-                        selectionBottomSheet(
-                          context,
-                          productModal!,
-                          'BUY',
-                          ref: x,
-                        );
-                      } else {
-                        var streamProductModal =
-                            x
-                                .watch(cartViewProductOrHomeProvider(id ?? ''))
-                                .value ??
-                            ProductModal();
-                        selectionBottomSheet(
-                          context,
-                          streamProductModal,
-                          'BUY',
-                          ref: x,
-                        );
-                      }
-                    },
-                  );
-                },
+        child: Row(
+          children: [
+            Expanded(
+              flex: 10,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 7),
+                child: Consumer(
+                  builder: (context, x, child) {
+                    return CustomButton(
+                      btnTitle: 'Buy now',
+                      onTap: () {
+                        if (productModal != null) {
+                          selectionBottomSheet(
+                            context,
+                            productModal!,
+                            'BUY',
+                            ref: x,
+                          );
+                        } else {
+                          var streamProductModal =
+                              x
+                                  .watch(
+                                    cartViewProductOrHomeProvider(id ?? ''),
+                                  )
+                                  .value ??
+                              ProductModal();
+                          selectionBottomSheet(
+                            context,
+                            streamProductModal,
+                            'BUY',
+                            ref: x,
+                          );
+                        }
+                      },
+                    );
+                  },
+                ),
               ),
             ),
-          ),
 
-          Expanded(
-            flex: 10,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 7),
-              child: Consumer(
-                builder: (context, x, child) {
-                  var loading = x.watch(cartProvider);
+            Expanded(
+              flex: 10,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 7),
+                child: Consumer(
+                  builder: (context, x, child) {
+                    var loading = x.watch(cartProvider);
 
-                  return CustomButton(
-                    onTap: () {
-                      if (productModal != null) {
-                        selectionBottomSheet(context, productModal!, 'CART');
-                      } else {
-                        var streamProductModal =
-                            x
-                                .watch(cartViewProductOrHomeProvider(id ?? ''))
-                                .value ??
-                            ProductModal();
-                        selectionBottomSheet(
-                          context,
-                          streamProductModal,
-                          'CART',
-                        );
-                      }
-                    },
-                    btnTitleWidget: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children:
-                          (loading == 'loading')
-                              ? const [
-                                CupertinoActivityIndicator(color: Colors.white),
-                              ]
-                              : const [
-                                Flexible(
-                                  child: Icon(
-                                    Icons.shopping_bag,
+                    return CustomButton(
+                      onTap: () {
+                        if (productModal != null) {
+                          selectionBottomSheet(context, productModal!, 'CART');
+                        } else {
+                          var streamProductModal =
+                              x
+                                  .watch(
+                                    cartViewProductOrHomeProvider(id ?? ''),
+                                  )
+                                  .value ??
+                              ProductModal();
+                          selectionBottomSheet(
+                            context,
+                            streamProductModal,
+                            'CART',
+                          );
+                        }
+                      },
+                      btnTitleWidget: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children:
+                            (loading == 'loading')
+                                ? const [
+                                  CupertinoActivityIndicator(
                                     color: Colors.white,
                                   ),
-                                ),
-                                Flexible(
-                                  child: FittedBox(
-                                    child: Text(
-                                      '  Add to cart',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                ]
+                                : const [
+                                  Flexible(
+                                    child: Icon(
+                                      Icons.shopping_bag,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: FittedBox(
+                                      child: Text(
+                                        '  Add to cart',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                    ),
-                  );
-                },
+                                ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
 
-          Expanded(
-            flex: 3,
-            child: Padding(
-              padding: EdgeInsets.only(right: 3),
-              child: IconButton(
-                onPressed: () {
-                  Clipboard.setData(
-                    ClipboardData(
-                      text:
-                          'https://sneakpeak.app${GoRouterState.of(context).matchedLocation}',
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.copy),
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: EdgeInsets.only(right: 3),
+                child: IconButton(
+                  onPressed: () {
+                    Clipboard.setData(
+                      ClipboardData(
+                        text:
+                            'https://sneakpeak.app${GoRouterState.of(context).matchedLocation}',
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.copy),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

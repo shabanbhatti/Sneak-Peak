@@ -234,7 +234,7 @@ Widget _bottomBtn(ProductModal productModal, String buyOrCart) {
     alignment: Alignment.bottomCenter,
     child: Container(
       width: double.infinity,
-      height: 60,
+      height: 90,
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(width: 1, color: Colors.grey.withAlpha(100)),
@@ -250,63 +250,67 @@ Widget _bottomBtn(ProductModal productModal, String buyOrCart) {
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             child:
                 (buyOrCart == 'CART')
-                    ? CustomButton(
-                      onTap: ()async {
-                        if (shoesSize != null && color.isNotEmpty) {
-                          var pM = ProductModal(
-                            id: productModal.id,
-                            brand: productModal.brand,
-                            colors: [color],
-                            description: productModal.description,
-                            genders: productModal.genders,
-                            price: productModal.price,
-                            img: productModal.img,
-                            storageImgsPath: productModal.storageImgsPath,
-                            title: productModal.title,
-                            shoesSizes: [shoesSize ?? 0],
-                          );
-                         loadingDialog(context, 'Adding to cart...');
-                          var isCarted= await x.read(cartProvider.notifier).addToCartBtnClick(pM,);
-                          Navigator.pop(context);
-                          if (isCarted) {
-                            SnackBarHelper.show('Add to cart successfuly');
+                    ? SafeArea(
+                      child: CustomButton(
+                        onTap: () async {
+                          if (shoesSize != null && color.isNotEmpty) {
+                            var pM = ProductModal(
+                              id: productModal.id,
+                              brand: productModal.brand,
+                              colors: [color],
+                              description: productModal.description,
+                              genders: productModal.genders,
+                              price: productModal.price,
+                              img: productModal.img,
+                              storageImgsPath: productModal.storageImgsPath,
+                              title: productModal.title,
+                              shoesSizes: [shoesSize ?? 0],
+                            );
+                            loadingDialog(context, 'Adding to cart...');
+                            var isCarted = await x
+                                .read(cartProvider.notifier)
+                                .addToCartBtnClick(pM);
                             Navigator.pop(context);
+                            if (isCarted) {
+                              SnackBarHelper.show('Add to cart successfuly');
+                              Navigator.pop(context);
+                            }
+                          } else {
+                            errorDialog(
+                              context,
+                              'Please select the color and size.',
+                            );
                           }
-                        } else {
-                          errorDialog(
-                            context,
-                            'Please select the color and size.',
-                          );
-                        }
-                      },
-                      btnTitleWidget: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children:
-                            (loading == 'loading')
-                                ? const [
-                                  CupertinoActivityIndicator(
-                                    color: Colors.white,
-                                  ),
-                                ]
-                                : const [
-                                  Flexible(
-                                    child: Icon(
-                                      Icons.shopping_bag,
+                        },
+                        btnTitleWidget: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children:
+                              (loading == 'loading')
+                                  ? const [
+                                    CupertinoActivityIndicator(
                                       color: Colors.white,
                                     ),
-                                  ),
-                                  Flexible(
-                                    child: FittedBox(
-                                      child: Text(
-                                        '  Add to cart',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                  ]
+                                  : const [
+                                    Flexible(
+                                      child: Icon(
+                                        Icons.shopping_bag,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Flexible(
+                                      child: FittedBox(
+                                        child: Text(
+                                          '  Add to cart',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                        ),
                       ),
                     )
                     : CustomButton(

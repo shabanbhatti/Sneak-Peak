@@ -26,10 +26,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -59,4 +56,16 @@ class DefaultFirebaseOptions {
     projectId: 'western-oarlock-466702-d3',
     storageBucket: 'western-oarlock-466702-d3.firebasestorage.app',
   );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyBenqS8B2XVcUe6n5-0Vrv1xehuFmMi5gI',
+    appId: '1:225529638875:ios:94ea7c5d16ab97c7a341fe',
+    messagingSenderId: '225529638875',
+    projectId: 'western-oarlock-466702-d3',
+    storageBucket: 'western-oarlock-466702-d3.firebasestorage.app',
+    androidClientId: '225529638875-fq2c9grbmm8vsdlmcdiakqq6657tb39d.apps.googleusercontent.com',
+    iosClientId: '225529638875-loisn3qs9bk5dho295p3fvhtq30ttpc5.apps.googleusercontent.com',
+    iosBundleId: 'com.example.sneakPeak',
+  );
+
 }

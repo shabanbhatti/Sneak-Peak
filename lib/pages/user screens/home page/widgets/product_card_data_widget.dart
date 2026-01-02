@@ -64,8 +64,7 @@ class ProductCardDataWidget extends ConsumerWidget {
                                                 'productModal':
                                                     productList[index],
                                                 'id': '',
-                                              }
-                                              as Map<String, dynamic>,
+                                              },
                                     );
                                   },
                                   onRemove: () async {

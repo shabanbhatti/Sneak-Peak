@@ -66,13 +66,11 @@ class AuthRepository {
     }
   }
 
-Future<AuthModal?> googleSignIn() async {
-    
+  Future<AuthModal?> googleSignIn() async {
     try {
-      
       var auth = await authService.signInWithGoogle();
       await cloudDbServices.createAccount(auth!, auth.id ?? '');
-       var fcmToken = await notificationService.getToken();
+      var fcmToken = await notificationService.getToken();
       var switcher = await SPHelper.getBoolForSwitcher(SPHelper.switcher);
       if (switcher) {
         await cloudDbServices.updateFcmToken(auth.id.toString(), fcmToken);
@@ -86,7 +84,6 @@ Future<AuthModal?> googleSignIn() async {
     }
   }
 
-
   Future<bool> login(String email, String password) async {
     try {
       var fcmToken = await notificationService.getToken();
@@ -95,7 +92,6 @@ Future<AuthModal?> googleSignIn() async {
       if (switcher) {
         await cloudDbServices.updateFcmToken(user.user!.uid, fcmToken);
       }
-
       if (user.user!.emailVerified) {
         SPHelper.setBool(SPHelper.logged, true);
 
@@ -187,6 +183,4 @@ Future<AuthModal?> googleSignIn() async {
       throw Exception(e.code);
     }
   }
-
-  
 }

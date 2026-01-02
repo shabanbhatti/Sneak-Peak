@@ -34,12 +34,12 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(authProvider('update_email'),(previous, next) {
+    ref.listen(authProvider('update_email'), (previous, next) {
       if (next is AuthErrorState) {
-        var error= next.error;
+        var error = next.error;
         SnackBarHelper.show(error, color: Colors.red);
       }
-    },);
+    });
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 5,
@@ -73,9 +73,9 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
 
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-              sliver: Form(
-                key: passwordkey,
-                child: SliverToBoxAdapter(
+              sliver: SliverToBoxAdapter(
+                child: Form(
+                  key: passwordkey,
                   child: CustomTextfields(
                     controller: passwordController,
                     title: 'Enter your password',
@@ -97,7 +97,6 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
                 ),
               ),
             ),
-
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               sliver: SliverToBoxAdapter(
@@ -112,20 +111,29 @@ class _UpdateEmailPageState extends ConsumerState<UpdateEmailPage> {
                                 'Update email',
                                 style: TextStyle(color: Colors.white),
                               ),
-                      onTap: ()async {
+                      onTap: () async {
                         var isEmailValidate = emailKey.currentState!.validate();
                         var isPasswordValidate =
                             passwordkey.currentState!.validate();
                         if (isEmailValidate && isPasswordValidate) {
-   var isUpdated=await ref.read(authProvider('update_email').notifier).updateEmail(emailController.text.trim(),passwordController.text.trim(),);
-if (mounted) {
-  if (isUpdated) {
-  loadingDialog(context,'Verification link has sent to ${emailController.text} in the spam folder, please verify!',);
-   await Future.delayed(const Duration(seconds: 10), () {
-        Navigator.pop(context);
-      });
-}
-}
+                 var isUpdated = await ref.read(authProvider('update_email').notifier).updateEmail(
+                                emailController.text.trim(),
+                                passwordController.text.trim(),
+                              );
+                          if (mounted) {
+                            if (isUpdated) {
+                              loadingDialog(
+                                context,
+                                'Verification link has sent to ${emailController.text} in the spam folder, please verify!',
+                              );
+                              await Future.delayed(
+                                const Duration(seconds: 10),
+                                () {
+                                  Navigator.pop(context);
+                                },
+                              );
+                            }
+                          }
                         }
                       },
                     );

@@ -63,8 +63,7 @@ class DataListWidget extends ConsumerWidget {
                                   'title': myList[index].title.toString(),
                                 },
                                 extra:
-                                    {'productModal': myList[index], 'id': ''}
-                                        as Map<String, dynamic>,
+                                    {'productModal': myList[index], 'id': ''},
                               );
                             },
                             onRemove: ()async{

@@ -84,84 +84,96 @@ class _CheckOutPageState extends ConsumerState<CheckOutPage> {
 }
 
 Widget _bottomBar() {
-  return Container(
-    width: double.infinity,
-    height: 70,
-    decoration: BoxDecoration(
-      border: Border(
-        bottom: BorderSide(width: 1, color: Colors.grey.withAlpha(100)),
-        top: BorderSide(color: Colors.grey.withAlpha(100), width: 1),
+  return SafeArea(
+    child: Container(
+      width: double.infinity,
+      height: 70,
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(width: 1, color: Colors.grey.withAlpha(100)),
+          top: BorderSide(color: Colors.grey.withAlpha(100), width: 1),
+        ),
       ),
-    ),
-    child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Expanded(
-            flex: 8,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Flexible(child: Text('Total:  ', maxLines: 1)),
-                        Flexible(
-                          child: Consumer(
-                            builder: (context, y, child) {
-                              var totalPrice = y.watch(selectedDataList);
-                              return Text(
-                                'Rs. ${priceFormat(totalPrice.totalPrice + 160)}',
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  color: Colors.orange,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              );
-                            },
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Expanded(
+              flex: 8,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(child: Text('Total:  ', maxLines: 1)),
+                          Flexible(
+                            child: Consumer(
+                              builder: (context, y, child) {
+                                var totalPrice = y.watch(selectedDataList);
+                                return Text(
+                                  'Rs. ${priceFormat(totalPrice.totalPrice + 160)}',
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Flexible(
-                    child: Text(
-                      '(Rs.160 delivery charges included)',
-                      style: TextStyle(color: appGreyColor, fontSize: 10),
+                    Flexible(
+                      child: Text(
+                        '(Rs.160 delivery charges included)',
+                        style: TextStyle(color: appGreyColor, fontSize: 10),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          Expanded(
-            flex: 6,
-            child:SizedBox(
-                  width: 140,
-                  child: Consumer(
-                    builder: (context, x, child) {
-                      var selectedList = x.watch(selectedDataList).cartList;
-                      var address= x.watch(addressProvider);
-                      return CustomButton(
-                        btnTitle: 'Place order',
-                        onTap: () {
-                          if (address is LoadedSuccessfulyAddressState) {
-                         if (address.addressModal!=null) {
-                           GoRouter.of(context).pushNamed(PaymentMethPage.pageName,extra: {'cartList':selectedList, 'pendingPageOrNot': false} as Map<String, dynamic>);     
-                         } else{
-                          SnackBarHelper.show('Please add your delivery address', color: Colors.red);
-                         }  }
-                        },
-                      );
-                    },
-                  ),
-                )
-          ),
-        ],
+            Expanded(
+              flex: 6,
+              child: SizedBox(
+                width: 140,
+                child: Consumer(
+                  builder: (context, x, child) {
+                    var selectedList = x.watch(selectedDataList).cartList;
+                    var address = x.watch(addressProvider);
+                    return CustomButton(
+                      btnTitle: 'Place order',
+                      onTap: () {
+                        if (address is LoadedSuccessfulyAddressState) {
+                          if (address.addressModal != null) {
+                            GoRouter.of(context).pushNamed(
+                              PaymentMethPage.pageName,
+                              extra: {
+                                'cartList': selectedList,
+                                'pendingPageOrNot': false,
+                              },
+                            );
+                          } else {
+                            SnackBarHelper.show(
+                              'Please add your delivery address',
+                              color: Colors.red,
+                            );
+                          }
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     ),
   );
